@@ -1,0 +1,26 @@
+{
+	"veniceSW": {
+		"latitude": 45.417110,
+		"longitude": 12.288723,
+		"radius": 0.0
+	},
+	"veniceNE": {
+		"latitude": 45.469140,
+		"longitude": 12.375412,
+		"radius": 0.0
+	},
+	"hashtags": [
+		"venice",
+		"rialtobridge",
+		"canal",
+		"gondola",
+		"italy",
+		"sanmarco"
+	],
+	"blacklist": [
+		"beach",
+		"california",
+		"florida",
+		"fl"
+	]
+}

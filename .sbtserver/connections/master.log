@@ -1,0 +1,47 @@
+New log file opened at Wed Apr 01 16:15:51 CEST 2015 by 3858@tsf-452-wpa-4-135.epfl.ch
+Taking next connection to: 61136
+New client attempting to connect on port: 61137-61136
+  Address = /128.179.156.135:61136
+This client on port 61137 has uuid 1bcdf16d-68e7-4251-b4ef-cb226e691b69 configName activator humanReadableName Activator protocolVersion 1 featureTags Vector()
+Connected Clients: activator-1bcdf16d-68e7-4251-b4ef-cb226e691b69
+Taking next connection to: 61136
+New client attempting to connect on port: 61138-61136
+  Address = /128.179.156.135:61136
+Handshake exception on socket: 61138
+sbt.impl.ipc.HandshakeException: Unable to perform handshake
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:46)
+	at sbt.impl.ipc.MultiClientServer.<init>(IPC.scala:150)
+	at sbt.server.SbtServerSocketHandler$$anon$1.run(SbtServerSocketHandler.scala:43)
+Caused by: java.net.SocketException: Connection reset
+	at java.net.SocketInputStream.read(SocketInputStream.java:196)
+	at java.net.SocketInputStream.read(SocketInputStream.java:122)
+	at java.io.BufferedInputStream.fill(BufferedInputStream.java:235)
+	at java.io.BufferedInputStream.read(BufferedInputStream.java:254)
+	at java.io.DataInputStream.readInt(DataInputStream.java:387)
+	at sbt.impl.ipc.Peer.receive(IPC.scala:95)
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:49)
+	... 2 more
+Taking next connection to: 61136
+New client attempting to connect on port: 61139-61136
+  Address = /128.179.156.135:61136
+This client on port 61139 has uuid 8c394117-3c3b-4004-8d90-b171eaf0bec2 configName activator humanReadableName Activator protocolVersion 1 featureTags Vector()
+Connected Clients: activator-1bcdf16d-68e7-4251-b4ef-cb226e691b69, activator-8c394117-3c3b-4004-8d90-b171eaf0bec2
+Taking next connection to: 61136
+New client attempting to connect on port: 61142-61136
+  Address = /128.179.156.135:61136
+Handshake exception on socket: 61142
+sbt.impl.ipc.HandshakeException: Unable to perform handshake
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:46)
+	at sbt.impl.ipc.MultiClientServer.<init>(IPC.scala:150)
+	at sbt.server.SbtServerSocketHandler$$anon$1.run(SbtServerSocketHandler.scala:43)
+Caused by: java.io.EOFException
+	at java.io.DataInputStream.readInt(DataInputStream.java:392)
+	at sbt.impl.ipc.Peer.receive(IPC.scala:95)
+	at sbt.impl.ipc.Peer.handshake(IPC.scala:49)
+	... 2 more
+Taking next connection to: 61136
+New client attempting to connect on port: 61143-61136
+  Address = /128.179.156.135:61136
+This client on port 61143 has uuid 49f13f7e-805e-4ed6-95ce-932d694a6bc0 configName activator humanReadableName Activator protocolVersion 1 featureTags Vector()
+Connected Clients: activator-1bcdf16d-68e7-4251-b4ef-cb226e691b69, activator-8c394117-3c3b-4004-8d90-b171eaf0bec2, activator-49f13f7e-805e-4ed6-95ce-932d694a6bc0
+Taking next connection to: 61136

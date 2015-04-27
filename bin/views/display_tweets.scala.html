@@ -1,0 +1,14 @@
+@(tweets: java.util.List[twitter4j.Status])
+
+@main("Welcome to Play")  {
+  <ul id="results">
+  @for(res <- tweets) {
+    <li>
+      <h1>@res.getUser.getName</h1>
+      <p>@res.getText</p>
+      <p>"Latitude: @res.getGeoLocation.getLatitude"</p>
+      <p>"Longitude: @res.getGeoLocation.getLongitude"</p>
+    </li>
+  }
+  </ul>
+}

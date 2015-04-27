@@ -1,0 +1,22 @@
+@(tweets: java.util.List[status.SimpleStatus])
+
+@main("VenitianBot") {
+    <div class="page-header">
+        <h1>VenitianBot in action <small>See received tweets</small></h1>
+    </div>
+
+    <div id="results">
+    @for(sStatus <- tweets) {
+        @sStatus.toHTML
+    }
+    </div>
+
+
+    <script type="text/javascript" charset="utf-8">
+        var venitian_ws = new WebSocket("@routes.Application.getSocket().webSocketURL()");
+        venitian_ws.onmessage = function(msg) {
+            console.log("received message from websocket:\n"+ msg.data);
+            $("#results").prepend(msg.data);
+        }
+    </script>
+}
