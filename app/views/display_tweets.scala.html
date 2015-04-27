@@ -16,7 +16,11 @@
         var venitian_ws = new WebSocket("@routes.Application.getSocket().webSocketURL()");
         venitian_ws.onmessage = function(msg) {
             console.log("received message from websocket:\n"+ msg.data);
-            $("#results").prepend(msg.data);
+            var results = $("#results");
+            if(results.children().size() == 15) {
+                results.children().last().remove();
+            }
+            results.prepend(msg.data);
         }
     </script>
 }
