@@ -1,7 +1,9 @@
 package bot;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import controllers.VenitianWSocket;
 import play.Logger;
+import play.libs.Json;
 import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
@@ -23,6 +25,7 @@ public class TwitterStreamListener implements StatusListener {
 
     @Override
     public void onStatus(Status arg0) {
+        Logger.debug(arg0.getUser().getScreenName());
         RankedStatus status = Classifier.classify(arg0);
 
 
@@ -32,8 +35,8 @@ public class TwitterStreamListener implements StatusListener {
             Logger.info("\t" + status.getContent().getText());
 
 //			VenitianBot.INSTANCE.getDB().insertIntoDB(status);
-            String htmlStatus = new SimpleStatus(status).toHTML();
-            Logger.debug("Sending " + htmlStatus + " to all websockets!");
+            ObjectNode htmlStatus = new SimpleStatus(status).toJson();
+            Logger.debug("Sending " + Json.stringify(htmlStatus) + " to all websockets!");
 
             String rep = VenitianBot.INSTANCE.replyTo(status);
 
@@ -41,7 +44,7 @@ public class TwitterStreamListener implements StatusListener {
                 System.out.println("Replied: \n to: " + status.getContent().getText() + "\n with: " + rep);
 
             for (VenitianWSocket socket : sockets) {
-                socket.sendMessage(htmlStatus);
+                socket.sendMessage(Json.stringify(htmlStatus));
             }
         }
 

@@ -7,7 +7,7 @@
 
     <div class="col-md-6" id="results">
     @for(sStatus <- tweets) {
-        @sStatus.toHTML
+        @sStatus.toJson().toString()
     }
     </div>
 
@@ -18,17 +18,34 @@
     <script type="text/javascript" charset="utf-8">
         var venitian_ws = new WebSocket("@routes.Application.getSocket().webSocketURL()");
         venitian_ws.onmessage = function(msg) {
-            console.log("received message from websocket:\n"+ msg.data);
-            var results = $("#results");
-            var replies = $("#replies");
-            if(results.children().size() == 15) {
-                results.children().last().remove();
+            var data = $.parseJSON(msg.data);
+            console.log("received message from websocket:\n"+ data);
+            var tweet;
+            var list;
+            if(data.user == undefined) {
+                tweet = "<div class=\"panel " + data.level + " reply\">" +
+                        "<div class=\"panel-body\">" +
+                        "<p> Tweet: " + data.content + "</p>" +
+                        "<p> Date: " + data.date + "</p>" +
+                        "</div>" +
+                        "</div>";
+                list = $("#replies");
+            } else {
+                tweet = "<div class=\"panel " + data.level + " status\">" +
+                        "<div class=\"panel-heading\">" + data.user + "</div>" +
+                        "<div class=\"panel-content\">" +
+                        "<p> Tweet: " + data.content + "</p>" +
+                        "<p> Date: " + data.date + "</p>" +
+                        "<p> Rank: " + data.rank + "</p>" +
+                        "</div>" +
+                        "</div>";
+
+                list = $("#results");
             }
-            results.prepend(msg.data);
-            if(replies.children().size() == 15) {
-                replies.children().last().remove();
+            if(list.children().size() == 15) {
+                list.children().last().remove();
             }
-            replies.prepend(msg.data);
+            list.prepend(tweet);
         };
     </script>
 }

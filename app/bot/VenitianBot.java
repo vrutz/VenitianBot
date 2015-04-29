@@ -8,19 +8,17 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.PriorityQueue;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
+import java.sql.Date;
+import java.util.*;
 
+import controllers.VenitianWSocket;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.h2.jdbcx.JdbcDataSource;
 
 import status.Classifier;
 import status.RankedStatus;
+import status.SimpleStatus;
 import status.StatusDatabase;
 import twitter4j.FilterQuery;
 import twitter4j.Twitter;
@@ -328,7 +326,10 @@ public enum VenitianBot {
             String reply = "@"
                     + chosenTweet.getContent().getUser().getScreenName() + " "
                     + answer.getTweet();
-
+//            SimpleStatus simpleReply = new SimpleStatus(new Date(new java.util.Date().getTime()), reply);
+//            for(VenitianWSocket socket: VenitianBot.INSTANCE.getStreamListener().sockets) {
+//                socket.sendMessage(simpleReply.toBotJson().toString());
+//            }
             // tweet(reply);
             return reply;
         }

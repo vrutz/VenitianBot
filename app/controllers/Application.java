@@ -24,6 +24,6 @@ public class Application extends Controller {
     }
 
     public static Result config() {
-        return play.mvc.Results.TODO;
+        return ok(views.html.conf.render());
     }
 }

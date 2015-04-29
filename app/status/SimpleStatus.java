@@ -1,9 +1,10 @@
 package status;
 
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import play.libs.Json;
 import twitter4j.Status;
 import utilities.Location;
 
-import java.io.Serializable;
 import java.sql.Date;
 
 /**
@@ -18,6 +19,16 @@ public class SimpleStatus {
     private final int RETWEET_COUNT;
     private final Location LOCATION;
     private final int RANK;
+
+    public SimpleStatus(Date date, String content) {
+        this.DATE = date;
+        this.USER = "VenitianBot";
+        this.CONTENT = content;
+        this.FAVORITE_COUNT = 0;
+        this.RETWEET_COUNT = 0;
+        this.LOCATION = null;
+        this.RANK = 0;
+    }
 
     public SimpleStatus(Date date, String user, String content,
                         int favCount, int retweetCount, Location loc, int rank) {
@@ -41,14 +52,29 @@ public class SimpleStatus {
         this.RANK = status.getRank();
     }
 
-    public String toHTML() {
-        return "<div class=\"panel panel-default status\">" +
-                "<div class=\"panel-heading\">" + USER + "</div>" +
-                "<div class =\"panel-content\">" +
-                "<p> Tweet: " + CONTENT + "</p>" +
-                "<p> Date: " + DATE.toString() + "</p>" +
-                "<p> Rank: " + (100 - RANK) + "</p>" +
-                "</div>" +
-                "</div>";
+    public ObjectNode toJson() {
+        return Json.newObject().put("level", getLevel())
+                .put("user", USER)
+                .put("content", CONTENT)
+                .put("date", DATE.toString())
+                .put("rank", (100 - RANK));
+    }
+
+    public ObjectNode toBotJson() {
+        return Json.newObject().put("level", getLevel())
+                .put("content", CONTENT)
+                .put("date", DATE.toString());
+    }
+
+    private String getLevel() {
+        if(RANK > 80) {
+            return"panel-danger";
+        } else if(RANK > 50) {
+            return "panel-warning";
+        } else if(RANK > 30) {
+            return "panel-info";
+        } else {
+            return "panel-success";
+        }
     }
 }
