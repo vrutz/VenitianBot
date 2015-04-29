@@ -25,3 +25,4 @@ dist
 /.project
 /RUNNING_PID
 /.settings
+twitter4j.properties
