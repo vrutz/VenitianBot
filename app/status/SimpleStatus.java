@@ -47,7 +47,7 @@ public class SimpleStatus {
                 "<div class =\"panel-content\">" +
                 "<p> Tweet: " + CONTENT + "</p>" +
                 "<p> Date: " + DATE.toString() + "</p>" +
-                "<p> Rank: " + RANK + "</p>" +
+                "<p> Rank: " + (100 - RANK) + "</p>" +
                 "</div>" +
                 "</div>";
     }

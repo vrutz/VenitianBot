@@ -13,6 +13,7 @@ public class VenitianWSocket extends WebSocket<String> {
 
     @Override
     public void onReady(In<String> in, Out<String> out) {
+        Logger.debug("Connected");
         final VenitianWSocket self = this;
         in.onMessage(new F.Callback<String>() {
             @Override

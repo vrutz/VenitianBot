@@ -86,7 +86,7 @@ public class RankedStatus implements Comparable<RankedStatus> {
     }
 
     public boolean isRelevant() {
-        return isRelevant;
+        return isRelevant && rank != 100;
     }
 
     public void setRelevance(boolean relevant) {
@@ -95,7 +95,6 @@ public class RankedStatus implements Comparable<RankedStatus> {
 
     public void addTag(String newTag) {
         tags.add(newTag);
-        ;
     }
 
     public Set<String> getTags() {

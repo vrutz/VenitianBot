@@ -22,4 +22,8 @@ public class Application extends Controller {
         VenitianBot.INSTANCE.getStreamListener().addWSocket(newWSocket);
         return newWSocket;
     }
+
+    public static Result config() {
+        return play.mvc.Results.TODO;
+    }
 }
