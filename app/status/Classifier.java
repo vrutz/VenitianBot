@@ -15,7 +15,7 @@ public class Classifier {
     private static String[] keyWordsGeneral;
     private static String[] blackListWords;
 
-    private static int threshold = 8;
+    private static int threshold = 92;
     // weight of the location in ranking
     public static int alpha = 4;
     // weight of the exact location in ranking
@@ -104,7 +104,7 @@ public class Classifier {
             }
         }
 
-        rankedStatus.setRelevance(rankedStatus.getRank() >= threshold
+        rankedStatus.setRelevance(rankedStatus.getRank() <= threshold
                 && !rankedStatus.getContent().getText().toLowerCase()
                 .contains("beach"));
         return rankedStatus;
