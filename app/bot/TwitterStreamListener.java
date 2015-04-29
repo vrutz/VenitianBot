@@ -25,6 +25,7 @@ public class TwitterStreamListener implements StatusListener {
     public void onStatus(Status arg0) {
         RankedStatus status = Classifier.classify(arg0);
 
+
         if (status.isRelevant()) {
             Logger.info("Status ranked " + status.getRank() +
                     ", from: " + status.getContent().getUser().getScreenName());
@@ -33,8 +34,15 @@ public class TwitterStreamListener implements StatusListener {
 //			VenitianBot.INSTANCE.getDB().insertIntoDB(status);
             String htmlStatus = new SimpleStatus(status).toHTML();
             Logger.debug("Sending " + htmlStatus + " to all websockets!");
+
+            String rep = VenitianBot.INSTANCE.replyTo(status);
+
+            if (!"".equals(rep))
+                System.out.println("Replied: \n to: " + status.getContent().getText() + "\n with: " + rep);
+
             for (VenitianWSocket socket : sockets) {
                 socket.sendMessage(htmlStatus);
+                Logger.debug("Send htmlStatus: " + htmlStatus);
             }
         }
     }

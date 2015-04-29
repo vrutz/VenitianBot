@@ -1,35 +1,51 @@
 package bot;
 
-import play.Logger;
-import play.db.DB;
-import status.Classifier;
-import status.RankedStatus;
-import status.SimpleStatus;
-import status.StatusDatabase;
-import twitter4j.*;
-import utilities.Location;
-import utilities.LocationBox;
-import utilities.Utilities;
+import static utilities.Utilities.readKeywords;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.PriorityQueue;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 
-import static utilities.Utilities.readKeywords;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.h2.jdbcx.JdbcDataSource;
+
+import status.Classifier;
+import status.RankedStatus;
+import status.StatusDatabase;
+import twitter4j.FilterQuery;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.TwitterFactory;
+import twitter4j.TwitterStream;
+import twitter4j.TwitterStreamFactory;
+import utilities.LocationBox;
+import utilities.Response;
+import utilities.Responses;
 
 public enum VenitianBot {
     INSTANCE;
 
+    public final Logger LOG = LogManager.getLogger(getClass());
     private Twitter twitter;
     private TwitterStream stream;
     private StatusDatabase db;
+
+    private static final String TABLE_NAME = "tweetsTable";
+    private static final String ID = "id";
+    private static final String FAVORITE_COUNT = "favoriteCount";
+    private static final String LATITUDE = "latitdue";
+    private static final String LONGITUDE = "longitude";
+    private static final String RETWEET_COUNT = "retweetCount";
 
     // Credentials and related constants
     private final String CREDENTIALS_FILE = "twitter4j.properties";
@@ -42,56 +58,136 @@ public enum VenitianBot {
     private final String TOKEN_SECRET_KEY = "oauth.accessTokenSecret";
     private final String TOKEN_SECRET_VALUE = "sSBvDS6UEssFyYhKkrc5OWH7fG4H6BC7QM3sUHpq9yEa7";
 
-    // Classification constants
-    private final int STRICT_LOCATION_WEIGHT = 10;
-    private final int GLOBAL_LOCATION_WEIGHT = 5;
-    private final int KEYWORD_MONUMENT_WEIGHT = 6;
-    private final int KEYWORD_VENICE_WEIGHT = 4;
-
-    private int classificationThreshold = 10;
-
     public final int MIN_SLEEP_TIME = 5000;
     private int sleepTime = 5000;
 
     private LocationBox veniseLocation;
-    private Location[] monumentsLocation;
-    private String veniseKeyword = "venice";
-    private String[] monumentsKeyword;
+
     private TwitterStreamListener streamListener;
     private boolean initialized = false;
 
+    private Connection conn;
+
+    // keep users we have replied
+    private Set<String> usersTweeted = new TreeSet<String>();
+    private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<RankedStatus>();
+
+    private int answerIndex = 0;
+
+    // replies
+    private int count = 0;
+    private int pointer = 0;
+    // We should take into account that we must add the person name in the tweet -> need to have some free characters
+
+    private Responses responses;
+
+    private String[] answers = {
+            "Did you know that the town dates back to the mid 400s, over 1500 years ago #Venice  ",
+            "Did you know that the Venice Republic was the biggest power of the Mediterranean during 1300's-1500's  #Venice  ",
+            "Did you know that Venice lies on an archipelago made up of 118 flat islands from the Veneto coast, in the northeastern Mediterranean  ",
+            "Did you know that Venice is made up of 118 islands, 416 bridges, 177 canals, 127 campi (squares).  ",
+            "The Veneto town is visited by 18 millions tourists a year, on average 50,000 a day. #Venice  ",
+            "Fun fact: Venice sits on an archipelago, which is basically a group of small islands. The city has 118 islands altogether  ",
+            "Did you know that #Venice contains approximately 7,000 chimneys. They come in 10 different styles and shapes.  ",
+            "There are 170 bell towers in #Venice. They were an important form of communication. #SanMarco is one of the tallest.  ",
+            "Fun fact: Each year #Venice receives 18 million tourists. This equates to approximately 50,000 visitors each day.  ",
+            "Did you know that #Venice is divided by quarters. There are six altogether.  ",
+            "Did you know that by the 18th century, there were over 200 #churches in #Venice  ",
+            "Did you know that #AcquaAlta, or high water, happens when the tide is 8.9916 cm above normal height #Venice  ",
+            "Did you know that #Venice is divided into six sestieri, or districts  ",
+            "Did you know that #Venice is sinking at the rate of 1-2 millimeters a year  ",
+            "Did you know only about 60,000 #Venetians live in the historic center of #Venice",
+            "Fun fact: #Venice was named after the ancient Veneti people.  ",
+            "Fun fact: #Venice was the major #Mediterranean maritime power in the 14th to 16th centuries.  ",
+            "Did you know there are 400+ pedestrian footbridges spanning the canals  ",
+            "Fun fact: #Venice has over 450 #palaces (palazzi) and important buildings built in a mixture of styles, #Gothic, #Byzantine, #Baroque …  ", // palace
+            "Fun fact: #Venice has 177 canals and over 400 bridges.  ",// canal, bridge
+            "Fun fact: Only 3 to 4 Gondolier licenses are issued annually - there are only 400 licensed Gondolas operating in Venice today.  ", // gondola
+            "Fun fact: #Venice got its first female gondolier in 2010  ", // gondola
+            "Fun fact: Giacomo Casanova, Marco Polo, and Antonio Vivaldi were born in #Venice  ", // casanova, marcopolo, vivaldi
+            "Did you know that the San Marco bell tower - or campanile - is the Italy's fifth tallest bell tower, measuring 98,6mt/275ft.  ", // sanmarco, belltower
+            "Fun fact: until Accademia Bridge was built in 1854, Rialto Bridge was the only place through which one could cross the canal on foot.", // accademia, rialtobridge
+            "Did you know that the Rialto Bridge design was done by a Swiss engineer: Antonio da Ponte.", // rialtobridge
+            "Fun fact: Three of the city’s bridges have been around since ancient times: #Rialto, #Accademia and the #Scalzi  ", // roaltobridge, accademia, scalzi
+            "Did you know that near the Rialto Bridge is the famous Rialto fish marketthat has been on the same site for over 1,000 year", // grandcanal, roaltobridge, accademia, scalzi
+            "Did you know that 3 major bridges cross the #GrandCanal – #Accademia, #Rialto and #Scalzi  ", // grandcanal, roaltobridge, accademia, scalzi
+            "Did you know that there are 3 ancient bridges over the Grand Canal: Rialto bridge, Accademia, Scalzi (Ferrovia).  ", // grandcanal, roaltobridge, accademia, scalzi
+            "Fun fact: The #GrandCanal is the region’s largest canal. Possessing a unique S-shape, the canal splits the city in half.  ", // grandcanal
+            "Fun fact: There are over 170 buildings that line the #GrandCanal  ", // grandcanal
+            "The biggest and longest canal is the S-shaped Grand Canal, splitting the town in two.  ", // grandcanal
+            "Did you know that the Grand Canal in Venice is 3800m long." // grandcanal
+
+    };
+
     public int getSleepTime() {
         return sleepTime;
-
     }
 
     public void setSleepTime(int time) {
         sleepTime = (time >= MIN_SLEEP_TIME) ? time : MIN_SLEEP_TIME;
     }
 
-    public StatusDatabase getDB() {
-        return db;
-    }
-
     public TwitterStreamListener getStreamListener() {
         return streamListener;
     }
 
-    public void init() throws SQLException {
-        if (!initialized) {
-            initCredentials();
-            twitter = TwitterFactory.getSingleton();
-            veniseLocation = Utilities.readGeoLocation();
-            monumentsLocation = Utilities.readMonumentsLocation();
-            monumentsKeyword = Utilities.getMonumentsKeyword(monumentsLocation);
+    public StatusDatabase getDB() {
+        return db;
+    }
 
-            Classifier.init();
-            db = new StatusDatabase()/*.init()*/;
+    public void init() throws SQLException {
+        initCredentials();
+        twitter = TwitterFactory.getSingleton();
+        veniseLocation = utilities.Utilities.readGeoLocation();
+
+
+        Classifier.init();
+
+        db = new StatusDatabase()/*.init()*/;
 //		db.drop();
-            streamListener = new TwitterStreamListener();
-            streamTweets();
-            initialized = true;
+        streamListener = new TwitterStreamListener();
+        streamTweets();
+        initialized = true;
+    }
+
+    // TODO: refactor by putting tags and answer in a JSON file and parse it to initialize the responses
+    public void initResponses() {
+        responses = new Responses();
+        for (int i = 0; i < 18; ++i) {
+            addAnswer(new String[]{});
         }
+        addAnswer(new String[]{"palace"});
+
+        addAnswer(new String[]{"canal", "bridge"});
+
+        addAnswer(new String[]{"gondola"});
+        addAnswer(new String[]{"gondola"});
+
+        addAnswer(new String[]{"casanova", "marcopolo", "vivaldi"});
+
+        addAnswer(new String[]{"sanmarco", "belltower"});
+
+        addAnswer(new String[]{"accademia", "rialtobridge"});
+
+        addAnswer(new String[]{"rialtobridge"});
+
+        addAnswer(new String[]{"roaltobridge", "accademia", "scalzi"});
+
+        addAnswer(new String[]{"grandcanal", "roaltobridge", "accademia", "scalzi"});
+        addAnswer(new String[]{"grandcanal", "roaltobridge", "accademia", "scalzi"});
+        addAnswer(new String[]{"grandcanal", "roaltobridge", "accademia", "scalzi"});
+
+        addAnswer(new String[]{"grandcanal"});
+        addAnswer(new String[]{"grandcanal"});
+        addAnswer(new String[]{"grandcanal"});
+        addAnswer(new String[]{"grandcanal"});
+    }
+
+    private void addAnswer(String[] tags) {
+        Set<String> tagSet = new HashSet<String>();
+        tagSet.addAll(Arrays.asList(tags));
+        responses.addResponse(new Response(tagSet, answers[answerIndex++]));
+
     }
 
     /**
@@ -103,7 +199,7 @@ public enum VenitianBot {
      */
     public void initCredentials() {
         Properties properties = new Properties();
-//		InputStream inputStream = null;
+        InputStream inputStream = null;
         OutputStream outputStream = null;
 
         try {
@@ -121,12 +217,12 @@ public enum VenitianBot {
             e.printStackTrace();
             System.exit(-1);
         } finally {
-//			if (inputStream != null) {
-//				try {
-//					inputStream.close();
-//				} catch (IOException e) { // Do nothing
-//				}
-//			}
+            if (inputStream != null) {
+                try {
+                    inputStream.close();
+                } catch (IOException e) { // Do nothing
+                }
+            }
             if (outputStream != null) {
                 try {
                     outputStream.close();
@@ -136,31 +232,44 @@ public enum VenitianBot {
         }
     }
 
+    private void initDatabse() throws SQLException {
+        JdbcDataSource ds = new JdbcDataSource();
+        ds.setURL("jdbc:h2:˜./test");
+        ds.setUser("sa");
+        ds.setPassword("sa");
+        conn = ds.getConnection();
+
+		/*
+         * conn.createStatement().execute("CREATE TABLE " + TABLE_NAME + " (" +
+		 * ID + " bigint," + FAVORITE_COUNT + " int," + LATITUDE + " float," +
+		 * LONGITUDE + " float," + RETWEET_COUNT + " int)");
+		 */
+
+    }
+
     /**
      *
      */
     public void streamTweets() {
-        if (stream == null) {
-            stream = new TwitterStreamFactory().getInstance();
-            stream.addListener(streamListener);
+        TwitterStream stream = new TwitterStreamFactory().getInstance();
+        stream.addListener(new TwitterStreamListener());
 
-            FilterQuery filter = new FilterQuery();
-            // Get tweets in english
-            filter.language(new String[]{"en"});
-            // OR Track keywords from the json
-            filter.track(readKeywords());
-            // OR Get tweets from the Venice region
-            double[][] venice = {
-                    // South West corner
-                    {veniseLocation.getSW().getLatitude(),
-                            veniseLocation.getSW().getLongitude()},
-                    // North East corner
-                    {veniseLocation.getNE().getLatitude(),
-                            veniseLocation.getNE().getLongitude()}};
-            filter.locations(venice);
+        FilterQuery filter = new FilterQuery();
+        // Get tweets in english
+        filter.language(new String[]{"en"});
+        // OR Track keywords from the json
+        filter.track(readKeywords());
+        // OR Get tweets from the Venice region
+        double[][] venice = {
+                // South West corner
+                {veniseLocation.getSW().getLatitude(),
+                        veniseLocation.getSW().getLongitude()},
+                // North East corner
+                {veniseLocation.getNE().getLatitude(),
+                        veniseLocation.getNE().getLongitude()},};
+        filter.locations(venice);
 
-            stream.filter(filter);
-        }
+        stream.filter(filter);
     }
 
     public void stopStream() {
@@ -180,8 +289,48 @@ public enum VenitianBot {
         try {
             twitter.updateStatus(status);
         } catch (TwitterException e) {
-            Logger.error("Failed to update status to: " + status);
+            LOG.error("Failed to update status to: " + status);
         }
-        Logger.info("Status updated to: " + status);
+        LOG.info("Status updated to: " + status);
+    }
+
+    /**
+     * The tweet passed as parametar is added to the encountered tweets by now.
+     * If we need to post a the given time, we take the head of the
+     * PriorityQueue, that is the highest ranked tweet from the tweets we have
+     *
+     * @param tweet
+     * @return
+     */
+    public String replyTo(RankedStatus tweet) {
+        rankedTweets.add(tweet);
+        count++;
+        RankedStatus chosenTweet = tweet;
+        if (count % 50 == 0) {
+            do {
+                chosenTweet = rankedTweets.poll(); // can't be empty since we
+                // add an elem just before
+            } while (usersTweeted.contains(chosenTweet.getContent().getUser()
+                    .getScreenName()));
+
+            // add that we have replied already to this user
+            usersTweeted
+                    .add(chosenTweet.getContent().getUser().getScreenName());
+
+            // get the most relevant answer for this tweet
+            Response answer = responses.getFirst(chosenTweet.getTags());
+
+
+            String reply = "@"
+                    + chosenTweet.getContent().getUser().getScreenName() + " "
+                    + answer.getTweet();
+            //+ answers[pointer % answers.length];
+
+            // tweet(reply);
+            pointer++;
+            return reply;
+        }
+        return "";
+
     }
 }

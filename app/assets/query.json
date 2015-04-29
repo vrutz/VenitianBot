@@ -12,15 +12,54 @@
 	"hashtags": [
 		"venice",
 		"rialtobridge",
-		"canal",
-		"gondola",
-		"italy",
-		"sanmarco"
+		"sanmarco",
+		"venezia",
+		"grandecanale",
+		"pontedirialto",
+		"sanpolo",
+		"canalasso",
+		"canalgrande",
+		"veneto",
+		"vinegia",
+		"venexia",
+		"venetiae",
+		"bridgefoscari",
+		"bridgesantamargherita",
+		"piazzasanmarco",
+		"stmark'scampanile",
+		"pontedellaliberta",
+		"giudeccacanal",
+		"pontedell'accademia",
+		"pontedellacostituzione",
+		"pontedegliscalzi"
+		
 	],
+	"hashtags-general": [
+		"canal",
+		"italy",
+		"beautifull",
+		"islands",
+		"grand",
+		"piazza",
+		"acquaalta",
+		"palace",
+		"gondolier",
+		"bridge",
+		"ponte",
+		"guidecca",
+		"vaporetto",
+		"carnival",
+		"gondola",
+		"fondaco"				
+	]
 	"blacklist": [
 		"beach",
 		"california",
 		"florida",
-		"fl"
+		"fl",
+		"shit",
+		"ocean",
+		"sand",
+		"hot"
 	]
 }

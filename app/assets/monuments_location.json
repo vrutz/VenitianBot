@@ -1,11 +1,13 @@
 {
-	"locations": [ "rialtobridge", "sanmarco" ],
+	"places": ["rialtobridge", "sanmarco" ],
 	"rialtobridge": {
+		"tags": [ "rialtobridge", "rialto_bridge", "rialto-bridge", "rialto bridge" ],
 		"latitude":45.43805,
 		"longitude":12.33594,
 		"radius":0.025
 	},
 	"sanmarco": {
+		"tags": [ "sanmarco", "san-marco", "san_marco", "san marco", "st. marco" ],
 		"latitude":45.43407,
 		"longitude":12.33838,
 		"radius":0.050
