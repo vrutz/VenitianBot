@@ -10,7 +10,7 @@ import utilities.Utilities;
 
 public class Classifier {
     private static Place[] places;
-    private static LocationBox veniseLocation;
+    private static LocationBox veniceLocation;
     private static String[] keyWords;
     private static String[] keyWordsGeneral;
     private static String[] blackListWords;
@@ -25,7 +25,7 @@ public class Classifier {
 
     public static void init() {
         places = Utilities.readMonumentsLocation();
-        veniseLocation = Utilities.readGeoLocation();
+        veniceLocation = Utilities.readGeoLocation();
         keyWords = Utilities.readKeywords();
         keyWordsGeneral = Utilities.readKeywordsGeneral();
         blackListWords = Utilities.readKeywordsBlackList();
@@ -69,7 +69,7 @@ public class Classifier {
                     rankedStatus.incRank(beta);
                     rankedStatus.addTag(place.getName());
                     System.out.println("Got precise location!");
-                } else if (veniseLocation.contains(rankedStatus.getLocation())) {
+                } else if (veniceLocation.contains(rankedStatus.getLocation())) {
                     rankedStatus.incRank(gama);
                     System.out.println("Got Venice location!");
                 }

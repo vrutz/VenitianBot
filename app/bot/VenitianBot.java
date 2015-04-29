@@ -28,17 +28,6 @@ public enum VenitianBot {
     private TwitterStream stream;
     private StatusDatabase db;
 
-    // Credentials and related constants
-    private final String CREDENTIALS_FILE = "twitter4j.properties";
-    private final String CONSUMER_KEY = "oauth.consumerKey";
-    private final String CONSUMER_VALUE = "yWRk3akWd4RcBAnrEokZLnZvI";
-    private final String CONSUMER_SECRET_KEY = "oauth.consumerSecret";
-    private final String CONSUMER_SECRET_VALUE = "jgd9zn4g2L2Nzq4FSwwBxXIl3l33ASq0xQwuWVwghqVJ4S1lwb";
-    private final String TOKEN_KEY = "oauth.accessToken";
-    private final String TOKEN_VALUE = "2926745097-e3AJzjC1VU6tcaexd82RNAbw1b4HPybN8nnIbgp";
-    private final String TOKEN_SECRET_KEY = "oauth.accessTokenSecret";
-    private final String TOKEN_SECRET_VALUE = "sSBvDS6UEssFyYhKkrc5OWH7fG4H6BC7QM3sUHpq9yEa7";
-
     public final int MIN_SLEEP_TIME = 5000;
     private int sleepTime = 5000;
 
@@ -111,7 +100,6 @@ public enum VenitianBot {
 
     public void init() throws SQLException {
         if (!initialized) {
-            initCredentials();
             twitter = TwitterFactory.getSingleton();
             veniseLocation = utilities.Utilities.readGeoLocation();
             Classifier.init();
@@ -161,48 +149,6 @@ public enum VenitianBot {
         tagSet.addAll(Arrays.asList(tags));
         responses.addResponse(new Response(tagSet, answers[answerIndex++]));
 
-    }
-
-    /**
-     * Stores the necessary keys to access the API in a file. The keys will be
-     * used automatically when requests are performed
-     * <p/>
-     * Consumer key and secrets as well as token key and secret can be found at
-     * https://apps.twitter.com/app/7947759/keys
-     */
-    public void initCredentials() {
-        Properties properties = new Properties();
-        InputStream inputStream = null;
-        OutputStream outputStream = null;
-
-        try {
-            // Stores the consumer key and secret
-            properties.setProperty(CONSUMER_KEY, CONSUMER_VALUE);
-            properties.setProperty(CONSUMER_SECRET_KEY, CONSUMER_SECRET_VALUE);
-
-            // Stores the token key and secret
-            properties.setProperty(TOKEN_KEY, TOKEN_VALUE);
-            properties.setProperty(TOKEN_SECRET_KEY, TOKEN_SECRET_VALUE);
-
-            outputStream = new FileOutputStream(CREDENTIALS_FILE);
-            properties.store(outputStream, CREDENTIALS_FILE);
-        } catch (IOException e) {
-            e.printStackTrace();
-            System.exit(-1);
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) { // Do nothing
-                }
-            }
-            if (outputStream != null) {
-                try {
-                    outputStream.close();
-                } catch (IOException e) { // Do nothing
-                }
-            }
-        }
     }
 
     /**
@@ -288,7 +234,7 @@ public enum VenitianBot {
             Logger.debug("preparing reply!");
             SimpleStatus simpleReply = new SimpleStatus(new java.sql.Date(new Date().getTime()), reply);
             Logger.debug(Json.stringify(simpleReply.toBotJson()));
-            for(VenitianWSocket socket: streamListener.sockets) {
+            for (VenitianWSocket socket : streamListener.sockets) {
                 Logger.debug("Bot tweets!");
                 socket.sendMessage(Json.stringify(simpleReply.toBotJson()));
             }
@@ -305,6 +251,4 @@ public enum VenitianBot {
         tweet(rep);
         return rep;
     }
-
-
 }
