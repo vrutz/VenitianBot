@@ -1,7 +1,6 @@
 package bot;
 
 import controllers.VenitianWSocket;
-import org.h2.jdbcx.JdbcDataSource;
 import play.Logger;
 import play.libs.Json;
 import status.Classifier;
@@ -17,7 +16,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -29,13 +27,6 @@ public enum VenitianBot {
     private Twitter twitter;
     private TwitterStream stream;
     private StatusDatabase db;
-
-    private static final String TABLE_NAME = "tweetsTable";
-    private static final String ID = "id";
-    private static final String FAVORITE_COUNT = "favoriteCount";
-    private static final String LATITUDE = "latitdue";
-    private static final String LONGITUDE = "longitude";
-    private static final String RETWEET_COUNT = "retweetCount";
 
     // Credentials and related constants
     private final String CREDENTIALS_FILE = "twitter4j.properties";
@@ -55,8 +46,6 @@ public enum VenitianBot {
 
     private TwitterStreamListener streamListener;
     private boolean initialized = false;
-
-    private Connection conn;
 
     // keep users we have replied
     private Set<String> usersTweeted = new TreeSet<String>();
@@ -111,14 +100,6 @@ public enum VenitianBot {
 
     private String formURL = "goo.gl/forms/fyx0PSmBzk";
     private String shamelessAdvertise = "Hey, I'm just a simple bot. Tell me more here: " + formURL;
-
-    public int getSleepTime() {
-        return sleepTime;
-    }
-
-    public void setSleepTime(int time) {
-        sleepTime = (time >= MIN_SLEEP_TIME) ? time : MIN_SLEEP_TIME;
-    }
 
     public TwitterStreamListener getStreamListener() {
         return streamListener;
@@ -224,21 +205,6 @@ public enum VenitianBot {
         }
     }
 
-    private void initDatabse() throws SQLException {
-        JdbcDataSource ds = new JdbcDataSource();
-        ds.setURL("jdbc:h2:˜./test");
-        ds.setUser("sa");
-        ds.setPassword("sa");
-        conn = ds.getConnection();
-
-		/*
-         * conn.createStatement().execute("CREATE TABLE " + TABLE_NAME + " (" +
-		 * ID + " bigint," + FAVORITE_COUNT + " int," + LATITUDE + " float," +
-		 * LONGITUDE + " float," + RETWEET_COUNT + " int)");
-		 */
-
-    }
-
     /**
      *
      */
@@ -293,8 +259,8 @@ public enum VenitianBot {
      * If we need to post a the given time, we take the head of the
      * PriorityQueue, that is the highest ranked tweet from the tweets we have
      *
-     * @param tweet
-     * @return
+     * @param tweet tweet to be added to the PriorityQueue
+     * @return the reply
      */
     public String replyTo(RankedStatus tweet) {
         rankedTweets.add(tweet);
