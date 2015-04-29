@@ -19,7 +19,7 @@
         var venitian_ws = new WebSocket("@routes.Application.getSocket().webSocketURL()");
         venitian_ws.onmessage = function(msg) {
             var data = $.parseJSON(msg.data);
-            console.log("received message from websocket:\n"+ data);
+            console.log("received message from websocket:\n"+ data.user);
             var tweet;
             var list;
             if(data.user == undefined) {

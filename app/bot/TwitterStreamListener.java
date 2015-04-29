@@ -36,12 +36,12 @@ public class TwitterStreamListener implements StatusListener {
 
 //			VenitianBot.INSTANCE.getDB().insertIntoDB(status);
             ObjectNode htmlStatus = new SimpleStatus(status).toJson();
-            Logger.debug("Sending " + Json.stringify(htmlStatus) + " to all websockets!");
+//            Logger.debug("Sending " + Json.stringify(htmlStatus) + " to all websockets!");
 
             String rep = VenitianBot.INSTANCE.replyTo(status);
 
             if (!"".equals(rep))
-                System.out.println("Replied: \n to: " + status.getContent().getText() + "\n with: " + rep);
+                Logger.info("Replied: \n to: " + status.getContent().getText() + "\n with: " + rep);
 
             for (VenitianWSocket socket : sockets) {
                 socket.sendMessage(Json.stringify(htmlStatus));
@@ -50,7 +50,7 @@ public class TwitterStreamListener implements StatusListener {
 
         if (arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "").equals("venitianbot")) {
             String reply = VenitianBot.INSTANCE.advertise(status);
-            System.out.println("Advertised " + reply + " in response to " + arg0.getText());
+            Logger.info("Advertised " + reply + " in response to " + arg0.getText());
         }
     }
 

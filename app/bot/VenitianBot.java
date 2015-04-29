@@ -1,9 +1,12 @@
 package bot;
 
+import controllers.VenitianWSocket;
 import org.h2.jdbcx.JdbcDataSource;
 import play.Logger;
+import play.libs.Json;
 import status.Classifier;
 import status.RankedStatus;
+import status.SimpleStatus;
 import status.StatusDatabase;
 import twitter4j.*;
 import utilities.LocationBox;
@@ -297,7 +300,7 @@ public enum VenitianBot {
         rankedTweets.add(tweet);
         count++;
         RankedStatus chosenTweet = tweet;
-        if (count % 50 == 0) {
+        if (count % 10 == 0) {
             do {
                 chosenTweet = rankedTweets.poll(); // can't be empty since we
                 // add an elem just before
@@ -315,10 +318,15 @@ public enum VenitianBot {
             String reply = "@"
                     + chosenTweet.getContent().getUser().getScreenName() + " "
                     + answer.getTweet();
-//            SimpleStatus simpleReply = new SimpleStatus(new Date(new java.util.Date().getTime()), reply);
-//            for(VenitianWSocket socket: VenitianBot.INSTANCE.getStreamListener().sockets) {
-//                socket.sendMessage(simpleReply.toBotJson().toString());
-//            }
+
+            Logger.debug("preparing reply!");
+            SimpleStatus simpleReply = new SimpleStatus(new java.sql.Date(new Date().getTime()), reply);
+            Logger.debug(Json.stringify(simpleReply.toBotJson()));
+            for(VenitianWSocket socket: streamListener.sockets) {
+                Logger.debug("Bot tweets!");
+                socket.sendMessage(Json.stringify(simpleReply.toBotJson()));
+            }
+
             // tweet(reply);
             return reply;
         }
