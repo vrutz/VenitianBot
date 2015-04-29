@@ -42,7 +42,6 @@ public class TwitterStreamListener implements StatusListener {
 
             for (VenitianWSocket socket : sockets) {
                 socket.sendMessage(htmlStatus);
-                Logger.debug("Send htmlStatus: " + htmlStatus);
             }
         }
     }

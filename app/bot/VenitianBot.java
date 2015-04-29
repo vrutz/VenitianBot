@@ -136,18 +136,17 @@ public enum VenitianBot {
     }
 
     public void init() throws SQLException {
-        initCredentials();
-        twitter = TwitterFactory.getSingleton();
-        veniseLocation = utilities.Utilities.readGeoLocation();
-
-
-        Classifier.init();
-
-        db = new StatusDatabase()/*.init()*/;
-//		db.drop();
-        streamListener = new TwitterStreamListener();
-        streamTweets();
-        initialized = true;
+        if (!initialized) {
+            initCredentials();
+            twitter = TwitterFactory.getSingleton();
+            veniseLocation = utilities.Utilities.readGeoLocation();
+            Classifier.init();
+            db = new StatusDatabase()/*.init()*/;
+//		    db.drop();
+            streamListener = new TwitterStreamListener();
+            streamTweets();
+            initialized = true;
+        }
     }
 
     // TODO: refactor by putting tags and answer in a JSON file and parse it to initialize the responses
@@ -251,25 +250,27 @@ public enum VenitianBot {
      *
      */
     public void streamTweets() {
-        TwitterStream stream = new TwitterStreamFactory().getInstance();
-        stream.addListener(new TwitterStreamListener());
+        if (stream == null) {
+            stream = new TwitterStreamFactory().getInstance();
+            stream.addListener(streamListener);
 
-        FilterQuery filter = new FilterQuery();
-        // Get tweets in english
-        filter.language(new String[]{"en"});
-        // OR Track keywords from the json
-        filter.track(readKeywords());
-        // OR Get tweets from the Venice region
-        double[][] venice = {
-                // South West corner
-                {veniseLocation.getSW().getLatitude(),
-                        veniseLocation.getSW().getLongitude()},
-                // North East corner
-                {veniseLocation.getNE().getLatitude(),
-                        veniseLocation.getNE().getLongitude()},};
-        filter.locations(venice);
+            FilterQuery filter = new FilterQuery();
+            // Get tweets in english
+            filter.language(new String[]{"en"});
+            // OR Track keywords from the json
+            filter.track(readKeywords());
+            // OR Get tweets from the Venice region
+            double[][] venice = {
+                    // South West corner
+                    {veniseLocation.getSW().getLatitude(),
+                            veniseLocation.getSW().getLongitude()},
+                    // North East corner
+                    {veniseLocation.getNE().getLatitude(),
+                            veniseLocation.getNE().getLongitude()},};
+            filter.locations(venice);
 
-        stream.filter(filter);
+            stream.filter(filter);
+        }
     }
 
     public void stopStream() {
