@@ -44,6 +44,11 @@ public class TwitterStreamListener implements StatusListener {
                 socket.sendMessage(htmlStatus);
             }
         }
+
+        if (arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "").equals("venitianbot")) {
+            String reply = VenitianBot.INSTANCE.advertise(status);
+            System.out.println("Advertised " + reply + " in response to " + arg0.getText());
+        }
     }
 
     public boolean addWSocket(VenitianWSocket socket) {

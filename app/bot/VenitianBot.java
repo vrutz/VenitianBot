@@ -76,9 +76,9 @@ public enum VenitianBot {
 
     // replies
     private int count = 0;
-    private int pointer = 0;
-    // We should take into account that we must add the person name in the tweet -> need to have some free characters
 
+
+    // We should take into account that we must add the person name in the tweet -> need to have some free characters
     private Responses responses;
 
     private String[] answers = {
@@ -118,6 +118,9 @@ public enum VenitianBot {
             "Did you know that the Grand Canal in Venice is 3800m long." // grandcanal
 
     };
+
+    private String formURL = "goo.gl/forms/fyx0PSmBzk";
+    private String shamelessAdvertise = "Hey, I'm just a simple bot. Tell me more here: " + formURL;
 
     public int getSleepTime() {
         return sleepTime;
@@ -325,13 +328,19 @@ public enum VenitianBot {
             String reply = "@"
                     + chosenTweet.getContent().getUser().getScreenName() + " "
                     + answer.getTweet();
-            //+ answers[pointer % answers.length];
 
             // tweet(reply);
-            pointer++;
             return reply;
         }
         return "";
 
     }
+
+    public String advertise(RankedStatus s) {
+        String rep = "@" + s.getContent().getUser().getScreenName() + " " + shamelessAdvertise;
+
+        return rep;
+    }
+
+
 }
