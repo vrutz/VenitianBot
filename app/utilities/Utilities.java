@@ -1,21 +1,19 @@
 package utilities;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.HashSet;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import play.Logger;
+
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.HashSet;
 
 /**
  * @author zhivka
  */
 public class Utilities {
-    private final static Logger LOG = LogManager.getLogger(Utilities.class);
 
     public static String consHashtags(String keywords) {
         if (keywords != null || " ".equals(keywords)) {
@@ -40,13 +38,13 @@ public class Utilities {
 
             return hashtagsArray;
         } catch (Exception e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } finally {
             if (queryFile != null) {
                 try {
                     queryFile.close();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    Logger.error(e.toString());
                 }
             }
         }
@@ -69,13 +67,13 @@ public class Utilities {
 
             return hashtagsArray;
         } catch (Exception e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } finally {
             if (queryFile != null) {
                 try {
                     queryFile.close();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    Logger.error(e.toString());
                 }
             }
         }
@@ -98,13 +96,13 @@ public class Utilities {
 
             return hashtagsArray;
         } catch (Exception e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } finally {
             if (queryFile != null) {
                 try {
                     queryFile.close();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    Logger.error(e.toString());
                 }
             }
         }
@@ -122,13 +120,13 @@ public class Utilities {
             LocationBox loc = new LocationBox(veniceSW, veniceNE);
             return loc;
         } catch (Exception e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } finally {
             if (fr != null) {
                 try {
                     fr.close();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    Logger.error(e.toString());
                 }
             }
         }
@@ -183,15 +181,15 @@ public class Utilities {
             }
             return monuments;
         } catch (IOException e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } catch (ParseException e) {
-            LOG.error(e);
+            Logger.error(e.toString());
         } finally {
             if (fr != null) {
                 try {
                     fr.close();
                 } catch (IOException e) {
-                    LOG.error(e);
+                    Logger.error(e.toString());
                 }
             }
         }

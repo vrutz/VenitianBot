@@ -1,6 +1,14 @@
 package bot;
 
-import static utilities.Utilities.readKeywords;
+import org.h2.jdbcx.JdbcDataSource;
+import play.Logger;
+import status.Classifier;
+import status.RankedStatus;
+import status.StatusDatabase;
+import twitter4j.*;
+import utilities.LocationBox;
+import utilities.Response;
+import utilities.Responses;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -8,32 +16,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.util.*;
 
-import controllers.VenitianWSocket;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-import org.h2.jdbcx.JdbcDataSource;
-
-import status.Classifier;
-import status.RankedStatus;
-import status.SimpleStatus;
-import status.StatusDatabase;
-import twitter4j.FilterQuery;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.TwitterFactory;
-import twitter4j.TwitterStream;
-import twitter4j.TwitterStreamFactory;
-import utilities.LocationBox;
-import utilities.Response;
-import utilities.Responses;
+import static utilities.Utilities.readKeywords;
 
 public enum VenitianBot {
     INSTANCE;
 
-    public final Logger LOG = LogManager.getLogger(getClass());
     private Twitter twitter;
     private TwitterStream stream;
     private StatusDatabase db;
@@ -291,9 +280,9 @@ public enum VenitianBot {
         try {
             twitter.updateStatus(status);
         } catch (TwitterException e) {
-            LOG.error("Failed to update status to: " + status);
+            Logger.error("Failed to update status to: " + status);
         }
-        LOG.info("Status updated to: " + status);
+        Logger.info("Status updated to: " + status);
     }
 
     /**
