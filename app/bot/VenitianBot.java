@@ -338,7 +338,7 @@ public enum VenitianBot {
 
     public String advertise(RankedStatus s) {
         String rep = "@" + s.getContent().getUser().getScreenName() + " " + shamelessAdvertise;
-
+        tweet(rep);
         return rep;
     }
 
