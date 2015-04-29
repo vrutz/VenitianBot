@@ -12,10 +12,6 @@ import utilities.LocationBox;
 import utilities.Response;
 import utilities.Responses;
 
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.sql.SQLException;
 import java.util.*;
 
@@ -31,14 +27,14 @@ public enum VenitianBot {
     public final int MIN_SLEEP_TIME = 5000;
     private int sleepTime = 5000;
 
-    private LocationBox veniseLocation;
+    private LocationBox veniceLocation;
 
     private TwitterStreamListener streamListener;
     private boolean initialized = false;
 
     // keep users we have replied
-    private Set<String> usersTweeted = new TreeSet<String>();
-    private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<RankedStatus>();
+    private Set<String> usersTweeted = new TreeSet<>();
+    private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<>();
 
     private int answerIndex = 0;
 
@@ -101,8 +97,9 @@ public enum VenitianBot {
     public void init() throws SQLException {
         if (!initialized) {
             twitter = TwitterFactory.getSingleton();
-            veniseLocation = utilities.Utilities.readGeoLocation();
+            veniceLocation = utilities.Utilities.readGeoLocation();
             Classifier.init();
+            initResponses();
             db = new StatusDatabase()/*.init()*/;
 //		    db.drop();
             streamListener = new TwitterStreamListener();
@@ -145,10 +142,9 @@ public enum VenitianBot {
     }
 
     private void addAnswer(String[] tags) {
-        Set<String> tagSet = new HashSet<String>();
+        Set<String> tagSet = new HashSet<>();
         tagSet.addAll(Arrays.asList(tags));
         responses.addResponse(new Response(tagSet, answers[answerIndex++]));
-
     }
 
     /**
@@ -167,11 +163,11 @@ public enum VenitianBot {
             // OR Get tweets from the Venice region
             double[][] venice = {
                     // South West corner
-                    {veniseLocation.getSW().getLatitude(),
-                            veniseLocation.getSW().getLongitude()},
+                    {veniceLocation.getSW().getLatitude(),
+                            veniceLocation.getSW().getLongitude()},
                     // North East corner
-                    {veniseLocation.getNE().getLatitude(),
-                            veniseLocation.getNE().getLongitude()},};
+                    {veniceLocation.getNE().getLatitude(),
+                            veniceLocation.getNE().getLongitude()},};
             filter.locations(venice);
 
             stream.filter(filter);

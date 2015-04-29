@@ -32,7 +32,7 @@ public class RankedStatus implements Comparable<RankedStatus> {
             this.location = new Location(content.getGeoLocation());
         else this.location = null;
 
-        this.tags = new HashSet<String>();
+        this.tags = new HashSet<>();
         this.isRelevant = false;
     }
 

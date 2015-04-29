@@ -117,8 +117,7 @@ public class Utilities {
             JSONObject queryJSON = (JSONObject) parser.parse(fr);
             Location veniceSW = getLocationByName(queryJSON, "veniceSW");
             Location veniceNE = getLocationByName(queryJSON, "veniceNE");
-            LocationBox loc = new LocationBox(veniceSW, veniceNE);
-            return loc;
+            return new LocationBox(veniceSW, veniceNE);
         } catch (Exception e) {
             Logger.error(e.toString());
         } finally {
@@ -141,8 +140,7 @@ public class Utilities {
         double longitude = (double) location.get("longitude");
         double radius = (double) location.get("radius");
 
-        Location loc = new Location(locationName, latitude, longitude, radius);
-        return loc;
+        return new Location(locationName, latitude, longitude, radius);
     }
 
     public static Place[] readMonumentsLocation() {
@@ -166,10 +164,10 @@ public class Utilities {
                 JSONObject place = (JSONObject) placesJSON.get(placeName);
 
                 JSONArray tags = (JSONArray) place.get("tags");
-                HashSet<String> tagSet = new HashSet<String>();
+                HashSet<String> tagSet = new HashSet<>();
 
-                for (int j = 0; j < tags.size(); ++j) {
-                    tagSet.add((String) tags.get(j));
+                for (Object tag : tags) {
+                    tagSet.add((String) tag);
                 }
 
                 double latitude = (double) place.get("latitude");
@@ -177,12 +175,9 @@ public class Utilities {
                 double radius = (double) place.get("radius");
                 monuments[i] = new Place(placeName, tagSet, latitude,
                         longitude, radius);
-                System.out.println(monuments[i]);
             }
             return monuments;
-        } catch (IOException e) {
-            Logger.error(e.toString());
-        } catch (ParseException e) {
+        } catch (IOException | ParseException e) {
             Logger.error(e.toString());
         } finally {
             if (fr != null) {

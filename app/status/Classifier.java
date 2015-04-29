@@ -3,6 +3,8 @@ package status;
 import java.util.ArrayList;
 import java.util.List;
 
+import play.Logger;
+
 import twitter4j.Status;
 import utilities.LocationBox;
 import utilities.Place;
@@ -32,7 +34,7 @@ public class Classifier {
     }
 
     public static List<RankedStatus> classifyByLocation(List<Status> statuses) {
-        List<RankedStatus> rankedStatuses = new ArrayList<RankedStatus>();
+        List<RankedStatus> rankedStatuses = new ArrayList<>();
 
         for (Status status : statuses) {
             rankedStatuses.add(classify(status));
@@ -68,10 +70,10 @@ public class Classifier {
                 if (place.contains(rankedStatus.getLocation())) {
                     rankedStatus.incRank(beta);
                     rankedStatus.addTag(place.getName());
-                    System.out.println("Got precise location!");
+                    Logger.debug("Got precise location!");
                 } else if (veniceLocation.contains(rankedStatus.getLocation())) {
                     rankedStatus.incRank(gama);
-                    System.out.println("Got Venice location!");
+                    Logger.debug("Got Venice location!");
                 }
             }
 
@@ -81,7 +83,7 @@ public class Classifier {
                         .contains(monumentTag)) {
                     rankedStatus.incRank(gama);
                     rankedStatus.addTag(place.getName());
-                    System.out.println("Got precise tag " + monumentTag + "!");
+                    Logger.debug("Got precise tag " + monumentTag + "!");
                 }
             }
 

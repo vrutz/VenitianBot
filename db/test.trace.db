@@ -1,3 +1,0 @@
-04-08 23:20:26 jdbc[7]: exception
-org.h2.jdbc.JdbcSQLException: Table "TWEETSTABLE" already exists; SQL statement:
-CREATE TABLE tweetsTable (id BIGINT NOT NULL AUTO_INCREMENT, user CHAR(18) NOT NULL, date DATE NOT NULL, content CHAR(140) NOT NULL, favoriteCount INT, retweetCount INT, latitude DOUBLE, longitude DOUBLE, rank INT, PRIMARY KEY (id)) [42101-175]
