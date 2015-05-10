@@ -21,6 +21,8 @@ import static utilities.Utilities.*;
 public enum VenitianBot {
     INSTANCE;
 
+    private static final String SCREEN_NAME = "VenitianBot";
+    private static final long TWITTER_ID = 2926745097L;
     private Twitter twitter;
     private TwitterStream stream;
     private StatusDatabase db;
@@ -31,6 +33,7 @@ public enum VenitianBot {
     private LocationBox veniceLocation;
 
     private TwitterStreamListener streamListener;
+    private VBotTwitterStream mentionsListener;
     private boolean initialized = false;
 
     // keep users we have replied
@@ -102,11 +105,18 @@ public enum VenitianBot {
             twitter = TwitterFactory.getSingleton();
             veniceLocation = readGeoLocation();
             Classifier.init();
+            Logger.info("Classifier initialized");
             initResponses();
+            Logger.info("Replies loaded");
             db = new StatusDatabase()/*.init()*/;
+            Logger.info("Database up");
 //		    db.drop();
+            mentionsListener = new VBotTwitterStream();
+            streamMentions();
+            Logger.info("Streaming replies");
             streamListener = new TwitterStreamListener();
             streamTweets();
+            Logger.info("Streaming tweets");
             initialized = true;
         }
     }
@@ -150,31 +160,50 @@ public enum VenitianBot {
         responses.addResponse(new Response(tagSet, answers[answerIndex++]));
     }
 
+    public String getScreenName() {
+        return SCREEN_NAME;
+    }
+
+    public long getTwitterID() {
+        return TWITTER_ID;
+    }
+
     /**
      *
      */
     public void streamTweets() {
         if (stream == null) {
             stream = new TwitterStreamFactory().getInstance();
-            stream.addListener(streamListener);
-
-            FilterQuery filter = new FilterQuery();
-            // Get tweets in english
-            filter.language(new String[]{"en"});
-            // OR Track keywords from the json
-            filter.track(readKeywords());
-            // OR Get tweets from the Venice region
-            double[][] venice = {
-                    // South West corner
-                    {veniceLocation.getSW().getLatitude(),
-                            veniceLocation.getSW().getLongitude()},
-                    // North East corner
-                    {veniceLocation.getNE().getLatitude(),
-                            veniceLocation.getNE().getLongitude()},};
-            filter.locations(venice);
-
-            stream.filter(filter);
         }
+        stream.addListener(streamListener);
+
+        FilterQuery filter = new FilterQuery();
+        // Get tweets in english
+        filter.language(new String[]{"en"});
+        // OR Track keywords from the json
+        filter.track(readKeywords());
+        // OR Get tweets from the Venice region
+        double[][] venice = {
+                // South West corner
+                {veniceLocation.getSW().getLatitude(),
+                        veniceLocation.getSW().getLongitude()},
+                // North East corner
+                {veniceLocation.getNE().getLatitude(),
+                        veniceLocation.getNE().getLongitude()},};
+        filter.locations(venice);
+
+        stream.filter(filter);
+    }
+
+    public void streamMentions() {
+        if (stream == null) {
+            stream = new TwitterStreamFactory().getInstance();
+        }
+        stream.addListener(mentionsListener);
+        FilterQuery filter = new FilterQuery();
+        filter.language(new String[]{"en"});
+        filter.follow(new long[]{TWITTER_ID});
+        stream.filter(filter);
     }
 
     public void stopStream() {
@@ -239,29 +268,60 @@ public enum VenitianBot {
             Logger.debug("Got answer" + answer);
 
 
-            String reply = "@"
-                    + chosenTweet.getContent().getUser().getScreenName() + " "
-                    + answer.getTweet();
+            StatusUpdate statusReply = new StatusUpdate(answer.getTweet());
+            try {
+                Status replied = reply(chosenTweet.getContent().getId(), statusReply);
 
-            Logger.debug("preparing reply!");
-            SimpleStatus simpleReply = new SimpleStatus(new java.sql.Date(new Date().getTime()), reply);
-            Logger.debug(Json.stringify(simpleReply.toBotJson()));
-            for (VenitianWSocket socket : streamListener.sockets) {
-                Logger.debug("Bot tweets!");
-                socket.sendMessage(Json.stringify(simpleReply.toBotJson()));
+                Logger.debug("preparing reply!");
+                String replyText = (replied == null) ? null : replied.getText();
+                SimpleStatus simpleReply = new SimpleStatus(new java.sql.Date(new Date().getTime()), replyText);
+                Logger.debug(Json.stringify(simpleReply.toBotJson()));
+                for (VenitianWSocket socket : streamListener.sockets) {
+                    Logger.debug("Bot tweets!");
+                    socket.sendMessage(Json.stringify(simpleReply.toBotJson()));
+                }
+                return replyText;
+            } catch (TwitterException e) {
+                Logger.error("Could not reply");
             }
 
-            //tweet(reply);
-            return reply;
+            return null;
         }
         return "";
 
     }
 
+    public String advertise() {
+        tweet(shamelessAdvertise);
+        return shamelessAdvertise;
+    }
+
     public String advertise(RankedStatus s) {
-        String rep = "@" + s.getContent().getUser().getScreenName() + " " + shamelessAdvertise;
-        tweet(rep);
-        return rep;
+        StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
+        try {
+            Status replied = reply(s.getContent().getId(), shamelessReply);
+            return (replied == null) ? null : replied.getText();
+        } catch (TwitterException e) {
+            Logger.error("Could not advertise shamelessly: " + e.getErrorMessage());
+        }
+        return null;
+    }
+
+    public String advertise(long replyToStatusId) {
+        StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
+        try {
+            Status replied = reply(replyToStatusId, shamelessReply);
+            return (replied == null) ? null : replied.getText();
+        } catch (TwitterException e) {
+            Logger.error("Could not advertise shamelessly: " + e.getErrorMessage());
+        }
+        return null;
+    }
+
+    public Status reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
+        statusReply.setInReplyToStatusId(replyToStatusId);
+//        return twitter.updateStatus(statusReply);
+        return null;
     }
 
     public List<String> getFeaturedUsers(){
