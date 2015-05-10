@@ -25,6 +25,10 @@
             if(data.user == undefined) {
                 console.log("Tweet from us");
                 tweet = "<div class=\"panel " + data.level + " reply\">" +
+                        "<div class=\"panel-heading\">" +
+                        "<p> Reply to user: "+ data.replyToScreenName + "</p>"+
+                        data.replyToContent +
+                        "</div>" +
                         "<div class=\"panel-body\">" +
                         "<p> Tweet: " + data.content + "</p>" +
                         "<p> Date: " + data.date + "</p>" +

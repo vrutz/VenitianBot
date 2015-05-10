@@ -15,12 +15,14 @@ public class SimpleStatus {
     private final Date DATE;
     private final String USER;
     private final String CONTENT;
+    private final String REPLY_SCREEN_NAME;
+    private final String REPLY_CONTENT;
     private final int FAVORITE_COUNT;
     private final int RETWEET_COUNT;
     private final Location LOCATION;
     private final int RANK;
 
-    public SimpleStatus(Date date, String content) {
+    public SimpleStatus(Date date, String content, String replyScreenName, String replyContent) {
         this.DATE = date;
         this.USER = "VenitianBot";
         this.CONTENT = content;
@@ -28,6 +30,8 @@ public class SimpleStatus {
         this.RETWEET_COUNT = 0;
         this.LOCATION = null;
         this.RANK = 0;
+        this.REPLY_SCREEN_NAME = replyScreenName;
+        this.REPLY_CONTENT = replyContent;
     }
 
     public SimpleStatus(Date date, String user, String content,
@@ -39,6 +43,8 @@ public class SimpleStatus {
         this.RETWEET_COUNT = retweetCount;
         this.LOCATION = loc;
         this.RANK = rank;
+        this.REPLY_SCREEN_NAME = "";
+        this.REPLY_CONTENT = "";
     }
 
     public SimpleStatus(RankedStatus status) {
@@ -50,6 +56,8 @@ public class SimpleStatus {
         this.RETWEET_COUNT = s.getFavoriteCount();
         this.LOCATION = status.getLocation();
         this.RANK = status.getRank();
+        this.REPLY_SCREEN_NAME = "";
+        this.REPLY_CONTENT = "";
     }
 
     public ObjectNode toJson() {
@@ -62,6 +70,8 @@ public class SimpleStatus {
 
     public ObjectNode toBotJson() {
         return Json.newObject().put("level", getLevel())
+                .put("replyToScreenName", REPLY_SCREEN_NAME)
+                .put("replyToContent", REPLY_CONTENT)
                 .put("content", CONTENT)
                 .put("date", DATE.toString());
     }

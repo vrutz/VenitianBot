@@ -192,7 +192,10 @@ public enum VenitianBot {
                 Logger.debug("preparing reply: " + statusReply.getStatus());
                 String replied = reply(chosenTweet.getContent().getId(), statusReply);
 
-                SimpleStatus simpleReply = new SimpleStatus(new java.sql.Date(new Date().getTime()), replied);
+                SimpleStatus simpleReply =
+                        new SimpleStatus(new java.sql.Date(new Date().getTime()), replied,
+                                chosenTweet.getContent().getUser().getScreenName(),
+                                chosenTweet.getContent().getText());
                 Logger.debug(Json.stringify(simpleReply.toBotJson()));
                 for (VenitianWSocket socket : streamListener.sockets) {
                     Logger.debug("Bot tweets!");
