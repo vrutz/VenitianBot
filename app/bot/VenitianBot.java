@@ -245,8 +245,7 @@ public enum VenitianBot {
     public String reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
         Logger.info("Replied to status with ID: " + replyToStatusId);
         statusReply.setInReplyToStatusId(replyToStatusId);
-//        return twitter.updateStatus(statusReply);
-        return statusReply.getStatus();
+        return twitter.updateStatus(statusReply).getText();
     }
 
     public List<String> getFeaturedUsers() {
