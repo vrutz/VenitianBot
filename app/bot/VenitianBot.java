@@ -27,13 +27,9 @@ public enum VenitianBot {
     private TwitterStream stream;
     private StatusDatabase db;
 
-    public final int MIN_SLEEP_TIME = 5000;
-    private int sleepTime = 5000;
-
     private LocationBox veniceLocation;
 
     private TwitterStreamListener streamListener;
-    private VBotTwitterStream mentionsListener;
     private boolean initialized = false;
 
     // keep users we have replied
@@ -108,12 +104,8 @@ public enum VenitianBot {
             Logger.info("Classifier initialized");
             initResponses();
             Logger.info("Replies loaded");
-            db = new StatusDatabase()/*.init()*/;
+            db = new StatusDatabase().init();
             Logger.info("Database up");
-//		    db.drop();
-            mentionsListener = new VBotTwitterStream();
-            streamMentions();
-            Logger.info("Streaming replies");
             streamListener = new TwitterStreamListener();
             streamTweets();
             Logger.info("Streaming tweets");
@@ -174,14 +166,18 @@ public enum VenitianBot {
     public void streamTweets() {
         if (stream == null) {
             stream = new TwitterStreamFactory().getInstance();
+            Logger.info("Created stream observer");
         }
         stream.addListener(streamListener);
 
         FilterQuery filter = new FilterQuery();
+
         // Get tweets in english
         filter.language(new String[]{"en"});
+
         // OR Track keywords from the json
         filter.track(readKeywords());
+
         // OR Get tweets from the Venice region
         double[][] venice = {
                 // South West corner
@@ -192,24 +188,21 @@ public enum VenitianBot {
                         veniceLocation.getNE().getLongitude()},};
         filter.locations(venice);
 
-        stream.filter(filter);
-    }
-
-    public void streamMentions() {
-        if (stream == null) {
-            stream = new TwitterStreamFactory().getInstance();
-        }
-        stream.addListener(mentionsListener);
-        FilterQuery filter = new FilterQuery();
-        filter.language(new String[]{"en"});
+        // OR tweets about Venitian Bot
         filter.follow(new long[]{TWITTER_ID});
+
         stream.filter(filter);
+        Logger.info("Filtering for tweets in english OR " +
+                "with keywords from app/assets/keywords.json OR " +
+                "from the region of Venice OR " +
+                "directed to/from the VenitianBot");
     }
 
     public void stopStream() {
         if (stream != null) {
             stream.shutdown();
             stream = null;
+            Logger.info("Stopping the stream observer");
         }
         initialized = false;
     }
@@ -292,12 +285,14 @@ public enum VenitianBot {
     }
 
     public String advertise() {
+        Logger.info("Shamelessly advertising");
         tweet(shamelessAdvertise);
         return shamelessAdvertise;
     }
 
     public String advertise(RankedStatus s) {
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
+        Logger.info("Shamelessly advertising");
         try {
             Status replied = reply(s.getContent().getId(), shamelessReply);
             return (replied == null) ? null : replied.getText();
@@ -309,6 +304,7 @@ public enum VenitianBot {
 
     public String advertise(long replyToStatusId) {
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
+        Logger.info("Shamelessly advertising");
         try {
             Status replied = reply(replyToStatusId, shamelessReply);
             return (replied == null) ? null : replied.getText();
@@ -320,6 +316,7 @@ public enum VenitianBot {
 
     public Status reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
         statusReply.setInReplyToStatusId(replyToStatusId);
+        Logger.info("Replied to Status ID " + replyToStatusId);
 //        return twitter.updateStatus(statusReply);
         return null;
     }

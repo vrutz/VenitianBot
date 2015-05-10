@@ -36,25 +36,30 @@ public class StatusDatabase {
     }
 
     public StatusDatabase init() throws SQLException {
-        connection.createStatement().execute(
-                "CREATE TABLE " + TABLE_NAME + " (" +
-                        ID + " BIGINT NOT NULL AUTO_INCREMENT, " +
-                        USER + " CHAR(18) NOT NULL, " +
-                        DATE + " DATE NOT NULL, " +
-                        CONTENT + " CHAR(140) NOT NULL, " +
-                        FAVORITE_COUNT + " INT, " +
-                        RETWEET_COUNT + " INT, " +
-                        LATITUDE + " DOUBLE, " +
-                        LONGITUDE + " DOUBLE, " +
-                        RANK + " INT, " +
-                        "PRIMARY KEY (" + ID + "))");
+        try {
+            connection.createStatement().execute(
+                    "CREATE TABLE " + TABLE_NAME + " (" +
+                            ID + " BIGINT NOT NULL AUTO_INCREMENT, " +
+                            USER + " CHAR(18) NOT NULL, " +
+                            DATE + " DATE NOT NULL, " +
+                            CONTENT + " CHAR(140) NOT NULL, " +
+                            FAVORITE_COUNT + " INT, " +
+                            RETWEET_COUNT + " INT, " +
+                            LATITUDE + " DOUBLE, " +
+                            LONGITUDE + " DOUBLE, " +
+                            RANK + " INT, " +
+                            "PRIMARY KEY (" + ID + "))");
+        } catch (SQLException e) {
+            Logger.debug("Database already exists or impossible to create.");
+        }
+
         return this;
     }
 
     public void closeConnection() {
         try {
             connection.close();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             Logger.error("Could not close connection to the DB");
             Logger.error(e.toString());
         }
@@ -63,8 +68,8 @@ public class StatusDatabase {
     public boolean clean() {
         try {
             connection.createStatement().execute("DELETE FROM " + TABLE_NAME);
-        } catch(SQLException e) {
-            Logger.error("Could not delete all rows in table "+ TABLE_NAME);
+        } catch (SQLException e) {
+            Logger.error("Could not delete all rows in table " + TABLE_NAME);
             Logger.error(e.toString());
             return false;
         }
@@ -74,8 +79,8 @@ public class StatusDatabase {
     public boolean drop() {
         try {
             connection.createStatement().execute("DROP TABLE " + TABLE_NAME);
-        } catch(SQLException e) {
-            Logger.error("Could not drop table "+ TABLE_NAME);
+        } catch (SQLException e) {
+            Logger.error("Could not drop table " + TABLE_NAME);
             Logger.error(e.toString());
             return false;
         }
@@ -84,29 +89,29 @@ public class StatusDatabase {
 
     public boolean insertIntoDB(String user, Date date, String content,
                                 int favCount, int retwtCount, Location loc,
-                                int rank)  {
-        Logger.debug("INSERT INTO "+ TABLE_NAME +"("+
-                USER +","+ DATE +","+ CONTENT +","+
-                FAVORITE_COUNT +","+ RETWEET_COUNT +","+
-                LATITUDE +","+ LONGITUDE +","+
+                                int rank) {
+        Logger.debug("INSERT INTO " + TABLE_NAME + "(" +
+                USER + "," + DATE + "," + CONTENT + "," +
+                FAVORITE_COUNT + "," + RETWEET_COUNT + "," +
+                LATITUDE + "," + LONGITUDE + "," +
                 RANK +
                 ") VALUES (" +
-                user +","+ new Date(date.getTime()).toString() +",\'"+
-                content +"\',"+ favCount +","+ retwtCount +","+
-                loc.getLatitude() +","+ loc.getLongitude() +","+
-                rank +")");
+                user + "," + new Date(date.getTime()).toString() + ",\'" +
+                content + "\'," + favCount + "," + retwtCount + "," +
+                loc.getLatitude() + "," + loc.getLongitude() + "," +
+                rank + ")");
         try {
             connection.createStatement().execute(
-                    "INSERT INTO "+ TABLE_NAME +"("+
-                            USER +","+ DATE +","+ CONTENT +","+
-                            FAVORITE_COUNT +","+ RETWEET_COUNT +","+
-                            LATITUDE +","+ LONGITUDE +","+
+                    "INSERT INTO " + TABLE_NAME + "(" +
+                            USER + "," + DATE + "," + CONTENT + "," +
+                            FAVORITE_COUNT + "," + RETWEET_COUNT + "," +
+                            LATITUDE + "," + LONGITUDE + "," +
                             RANK +
                             ") VALUES (" +
-                            user +","+ new Date(date.getTime()).toString() +",\'"+
-                            content +"\',"+ favCount +","+ retwtCount +","+
-                            loc.getLatitude() +","+ loc.getLongitude() +","+
-                            rank +")"
+                            user + "," + new Date(date.getTime()).toString() + ",\'" +
+                            content + "\'," + favCount + "," + retwtCount + "," +
+                            loc.getLatitude() + "," + loc.getLongitude() + "," +
+                            rank + ")"
             );
         } catch (SQLException e) {
             Logger.error(e.toString());
@@ -115,7 +120,7 @@ public class StatusDatabase {
         return true;
     }
 
-    public boolean insertIntoDB(RankedStatus status)  {
+    public boolean insertIntoDB(RankedStatus status) {
         Status tweet = status.getContent();
         return insertIntoDB(
                 tweet.getUser().getScreenName(),
@@ -129,7 +134,7 @@ public class StatusDatabase {
         try {
             Statement stmt = connection.createStatement();
             ResultSet res = stmt.executeQuery(
-                    "SELECT TOP 10 * FROM " + TABLE_NAME +" "+
+                    "SELECT TOP 10 * FROM " + TABLE_NAME + " " +
                             "WHERE " + DATE + " >= CURRENT_DATE");
 
             DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
@@ -140,7 +145,7 @@ public class StatusDatabase {
                             res.getString(USER), res.getString(CONTENT),
                             res.getInt(FAVORITE_COUNT), res.getInt(RETWEET_COUNT),
                             new Location(res.getDouble(LATITUDE),
-                                         res.getDouble(LONGITUDE)),
+                                    res.getDouble(LONGITUDE)),
                             res.getInt(RANK)));
                 } catch (ParseException e) {
                     Logger.error("Could not parse " + res.getString(DATE));

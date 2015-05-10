@@ -20,7 +20,7 @@ public class TwitterStreamListener implements StatusListener {
     List<VenitianWSocket> sockets;
 
     public TwitterStreamListener() {
-        sockets = new ArrayList<>();
+        sockets = new ArrayList<VenitianWSocket>();
     }
 
     @Override
