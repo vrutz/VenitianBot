@@ -207,8 +207,11 @@ public enum VenitianBot {
     public String replyTo(RankedStatus tweet) {
         rankedTweets.add(tweet);
         count++;
-        RankedStatus chosenTweet = tweet;
+        RankedStatus chosenTweet;
+        Logger.debug("Received tweets " + count);
         if (count % 10 == 0) {
+            Logger.debug("In if");
+
             do {
                 chosenTweet = rankedTweets.poll(); // can't be empty since we
                 // add an elem just before
@@ -221,6 +224,7 @@ public enum VenitianBot {
 
             // get the most relevant answer for this tweet
             Response answer = responses.getFirst(chosenTweet.getTags());
+            Logger.debug("Got answer" + answer);
 
 
             String reply = "@"
@@ -235,7 +239,7 @@ public enum VenitianBot {
                 socket.sendMessage(Json.stringify(simpleReply.toBotJson()));
             }
 
-            // tweet(reply);
+            //tweet(reply);
             return reply;
         }
         return "";

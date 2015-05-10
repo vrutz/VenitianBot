@@ -1,9 +1,8 @@
 package utilities;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.PriorityQueue;
-import java.util.Set;
+import play.Logger;
+
+import java.util.*;
 
 /**
  * Represents a list of Response that can be used to retrieve the most relevant
@@ -14,9 +13,10 @@ import java.util.Set;
 
 public class Responses {
     private List<Response> responses;
+    private int pointer = new Random().nextInt();
 
     public Responses() {
-        responses = new ArrayList<Response>();
+        responses = new ArrayList<>();
     }
 
     public void addResponse(Response newResponse) {
@@ -37,14 +37,14 @@ public class Responses {
                     newResp.incRank();
                 }
             }
-            if (newResp.getRank() > 0) {
+            if (newResp.getRank() < 100) {
                 respQueue.add(newResp);
             }
         }
 
         List<Response> res = new ArrayList<Response>();
 
-        for (int i = 0; i < k; ++i) {
+        for (int i = 0; i < k && !respQueue.isEmpty(); ++i) {
             res.add(respQueue.poll());
         }
 
@@ -53,7 +53,13 @@ public class Responses {
 
 
     public Response getFirst(Set<String> keywords) {
-        return getTopK(keywords, 1).get(0);
+        List<Response> topK = getTopK(keywords, 1);
+        if (topK.size() == 0) {
+            return responses.get(pointer++ % responses.size());
+        } else {
+            return topK.get(0);
+        }
+
     }
 
     @Override
