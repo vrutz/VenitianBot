@@ -52,7 +52,7 @@
 		"gondola",
 		"fondaco"				
 	],
-	"blacklist": [
+	"black-list": [
 		"beach",
 		"california",
 		"florida",
@@ -61,5 +61,8 @@
 		"ocean",
 		"sand",
 		"hot"
-	]
+	],
+  "featured-users": [
+    "f_foscari"
+  ]
 }

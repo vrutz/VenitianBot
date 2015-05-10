@@ -3,6 +3,7 @@ package status;
 import java.util.HashSet;
 import java.util.Set;
 
+import bot.VenitianBot;
 import twitter4j.Status;
 import utilities.Location;
 
@@ -19,6 +20,8 @@ public class RankedStatus implements Comparable<RankedStatus> {
     private Location location; // will be immutable
     private Set<String> tags;
     private boolean isRelevant;
+    private boolean isFeatured;
+
 
 
     public RankedStatus(Status content) {
@@ -34,6 +37,9 @@ public class RankedStatus implements Comparable<RankedStatus> {
 
         this.tags = new HashSet<>();
         this.isRelevant = false;
+
+        isFeatured = VenitianBot.INSTANCE.getFeaturedUsers().contains(content.getUser().getName().toLowerCase());
+
     }
 
     public Status getContent() {
@@ -89,6 +95,8 @@ public class RankedStatus implements Comparable<RankedStatus> {
         return isRelevant && rank != 100;
     }
 
+    public boolean isFeatured() { return isFeatured; }
+
     public void setRelevance(boolean relevant) {
         isRelevant = relevant;
     }
@@ -100,6 +108,7 @@ public class RankedStatus implements Comparable<RankedStatus> {
     public Set<String> getTags() {
         return new HashSet<String>(tags);
     }
+
 
     /**
      * Compares two RankedStatus objects by their ranks.

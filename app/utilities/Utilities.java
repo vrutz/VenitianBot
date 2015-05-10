@@ -23,75 +23,33 @@ public class Utilities {
     }
 
     public static String[] readKeywords() {
-        JSONParser parser = new JSONParser();
-        FileReader queryFile = null;
-        try {
-            queryFile = new FileReader("./app/assets/query.json");
-            JSONObject queryJSON = (JSONObject) parser.parse(queryFile);
-            JSONArray hashtags = (JSONArray) queryJSON.get("hashtags");
-
-            String[] hashtagsArray = new String[hashtags.size()];
-
-            for (int i = 0; i < hashtagsArray.length; ++i) {
-                hashtagsArray[i] = "" + hashtags.get(i);
-            }
-
-            return hashtagsArray;
-        } catch (Exception e) {
-            Logger.error(e.toString());
-        } finally {
-            if (queryFile != null) {
-                try {
-                    queryFile.close();
-                } catch (IOException e) {
-                    Logger.error(e.toString());
-                }
-            }
-        }
-        return new String[]{};
+        return readJSON("./app/assets/query.json", "hashtags");
     }
 
     public static String[] readKeywordsGeneral() {
-        JSONParser parser = new JSONParser();
-        FileReader queryFile = null;
-        try {
-            queryFile = new FileReader("./app/assets/query.json");
-            JSONObject queryJSON = (JSONObject) parser.parse(queryFile);
-            JSONArray hashtags = (JSONArray) queryJSON.get("hashtags-general");
-
-            String[] hashtagsArray = new String[hashtags.size()];
-
-            for (int i = 0; i < hashtagsArray.length; ++i) {
-                hashtagsArray[i] = "" + hashtags.get(i);
-            }
-
-            return hashtagsArray;
-        } catch (Exception e) {
-            Logger.error(e.toString());
-        } finally {
-            if (queryFile != null) {
-                try {
-                    queryFile.close();
-                } catch (IOException e) {
-                    Logger.error(e.toString());
-                }
-            }
-        }
-        return new String[]{};
+        return readJSON("./app/assets/query.json", "hashtags-general");
     }
 
     public static String[] readKeywordsBlackList() {
+        return readJSON("./app/assets/query.json", "black-list");
+    }
+
+    public static String[] readFeaturedUsers() {
+        return readJSON("./app/assets/query.json", "featured-users");
+    }
+
+    private static String[] readJSON(String filePath, String key) {
         JSONParser parser = new JSONParser();
         FileReader queryFile = null;
         try {
-            queryFile = new FileReader("./app/assets/query.json");
+            queryFile = new FileReader(filePath);
             JSONObject queryJSON = (JSONObject) parser.parse(queryFile);
-            JSONArray hashtags = (JSONArray) queryJSON.get("blacklist");
+            JSONArray values = (JSONArray) queryJSON.get(key);
 
-            String[] hashtagsArray = new String[hashtags.size()];
+            String[] hashtagsArray = new String[values.size()];
 
             for (int i = 0; i < hashtagsArray.length; ++i) {
-                hashtagsArray[i] = "" + hashtags.get(i);
+                hashtagsArray[i] = "" + values.get(i);
             }
 
             return hashtagsArray;

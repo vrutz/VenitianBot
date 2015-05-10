@@ -3,6 +3,7 @@ package bot;
 import controllers.VenitianWSocket;
 import play.Logger;
 import play.libs.Json;
+import java.util.List;
 import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
@@ -15,7 +16,7 @@ import utilities.Responses;
 import java.sql.SQLException;
 import java.util.*;
 
-import static utilities.Utilities.readKeywords;
+import static utilities.Utilities.*;
 
 public enum VenitianBot {
     INSTANCE;
@@ -86,6 +87,8 @@ public enum VenitianBot {
     private String formURL = "goo.gl/forms/fyx0PSmBzk";
     private String shamelessAdvertise = "Hey, I'm just a simple bot. Tell me more here: " + formURL;
 
+    private String[] featuredUsers  = readFeaturedUsers();
+
     public TwitterStreamListener getStreamListener() {
         return streamListener;
     }
@@ -97,7 +100,7 @@ public enum VenitianBot {
     public void init() throws SQLException {
         if (!initialized) {
             twitter = TwitterFactory.getSingleton();
-            veniceLocation = utilities.Utilities.readGeoLocation();
+            veniceLocation = readGeoLocation();
             Classifier.init();
             initResponses();
             db = new StatusDatabase()/*.init()*/;
@@ -196,6 +199,15 @@ public enum VenitianBot {
         Logger.info("Status updated to: " + status);
     }
 
+    public void retweet(long statusID) {
+        try {
+            twitter.retweetStatus(statusID);
+        } catch (TwitterException e) {
+            Logger.error("Failed to retweet status : " + statusID);
+        }
+
+        Logger.info("Retweeted status: " + statusID);
+    }
     /**
      * The tweet passed as parametar is added to the encountered tweets by now.
      * If we need to post a the given time, we take the head of the
@@ -250,5 +262,9 @@ public enum VenitianBot {
         String rep = "@" + s.getContent().getUser().getScreenName() + " " + shamelessAdvertise;
         tweet(rep);
         return rep;
+    }
+
+    public List<String> getFeaturedUsers(){
+        return Arrays.asList(featuredUsers);
     }
 }
