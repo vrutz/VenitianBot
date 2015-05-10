@@ -3,7 +3,9 @@ package bot;
 import controllers.VenitianWSocket;
 import play.Logger;
 import play.libs.Json;
+
 import java.util.List;
+
 import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
@@ -26,6 +28,9 @@ public enum VenitianBot {
     private Twitter twitter;
     private TwitterStream stream;
     private StatusDatabase db;
+
+    public final int MIN_SLEEP_TIME = 5000;
+    private int sleepTime = 5000;
 
     private LocationBox veniceLocation;
 
@@ -86,7 +91,7 @@ public enum VenitianBot {
     private String formURL = "goo.gl/forms/fyx0PSmBzk";
     private String shamelessAdvertise = "Hey, I'm just a simple bot. Tell me more here: " + formURL;
 
-    private String[] featuredUsers  = readFeaturedUsers();
+    private String[] featuredUsers = readFeaturedUsers();
 
     public TwitterStreamListener getStreamListener() {
         return streamListener;
@@ -166,18 +171,14 @@ public enum VenitianBot {
     public void streamTweets() {
         if (stream == null) {
             stream = new TwitterStreamFactory().getInstance();
-            Logger.info("Created stream observer");
         }
         stream.addListener(streamListener);
 
         FilterQuery filter = new FilterQuery();
-
         // Get tweets in english
         filter.language(new String[]{"en"});
-
         // OR Track keywords from the json
         filter.track(readKeywords());
-
         // OR Get tweets from the Venice region
         double[][] venice = {
                 // South West corner
@@ -188,21 +189,13 @@ public enum VenitianBot {
                         veniceLocation.getNE().getLongitude()},};
         filter.locations(venice);
 
-        // OR tweets about Venitian Bot
-        filter.follow(new long[]{TWITTER_ID});
-
         stream.filter(filter);
-        Logger.info("Filtering for tweets in english OR " +
-                "with keywords from app/assets/keywords.json OR " +
-                "from the region of Venice OR " +
-                "directed to/from the VenitianBot");
     }
 
     public void stopStream() {
         if (stream != null) {
             stream.shutdown();
             stream = null;
-            Logger.info("Stopping the stream observer");
         }
         initialized = false;
     }
@@ -230,6 +223,7 @@ public enum VenitianBot {
 
         Logger.info("Retweeted status: " + statusID);
     }
+
     /**
      * The tweet passed as parametar is added to the encountered tweets by now.
      * If we need to post a the given time, we take the head of the
@@ -285,14 +279,12 @@ public enum VenitianBot {
     }
 
     public String advertise() {
-        Logger.info("Shamelessly advertising");
         tweet(shamelessAdvertise);
         return shamelessAdvertise;
     }
 
     public String advertise(RankedStatus s) {
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
-        Logger.info("Shamelessly advertising");
         try {
             Status replied = reply(s.getContent().getId(), shamelessReply);
             return (replied == null) ? null : replied.getText();
@@ -304,7 +296,6 @@ public enum VenitianBot {
 
     public String advertise(long replyToStatusId) {
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
-        Logger.info("Shamelessly advertising");
         try {
             Status replied = reply(replyToStatusId, shamelessReply);
             return (replied == null) ? null : replied.getText();
@@ -316,12 +307,11 @@ public enum VenitianBot {
 
     public Status reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
         statusReply.setInReplyToStatusId(replyToStatusId);
-        Logger.info("Replied to Status ID " + replyToStatusId);
 //        return twitter.updateStatus(statusReply);
         return null;
     }
 
-    public List<String> getFeaturedUsers(){
+    public List<String> getFeaturedUsers() {
         return Arrays.asList(featuredUsers);
     }
 }
