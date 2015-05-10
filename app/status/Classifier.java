@@ -6,9 +6,9 @@ import java.util.List;
 import play.Logger;
 
 import twitter4j.Status;
+import utilities.JSONReader;
 import utilities.LocationBox;
 import utilities.Place;
-import utilities.Utilities;
 
 public class Classifier {
     private static Place[] places;
@@ -26,11 +26,11 @@ public class Classifier {
     public static int gama = 8;
 
     public static void init() {
-        places = Utilities.readMonumentsLocation();
-        veniceLocation = Utilities.readGeoLocation();
-        keyWords = Utilities.readKeywords();
-        keyWordsGeneral = Utilities.readKeywordsGeneral();
-        blackListWords = Utilities.readKeywordsBlackList();
+        places = JSONReader.places;
+        veniceLocation = JSONReader.veniceLocation;
+        keyWords = JSONReader.keyWords;
+        keyWordsGeneral = JSONReader.keyWordsGeneral;
+        blackListWords = JSONReader.blackListWords;
     }
 
     public static List<RankedStatus> classifyByLocation(List<Status> statuses) {
@@ -86,7 +86,6 @@ public class Classifier {
                     Logger.debug("Got precise tag " + monumentTag + "!");
                 }
             }
-
         }
 
         // check if word contains any of the keywords

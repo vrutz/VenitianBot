@@ -8,7 +8,8 @@ import play.Logger;
 
 import java.io.FileReader;
 import java.io.IOException;
-import java.util.HashSet;
+import java.io.RandomAccessFile;
+import java.util.*;
 
 /**
  * @author zhivka
@@ -155,6 +156,65 @@ public class Utilities {
             monumentsKeyword[i] = locations[i].getName();
         }
         return monumentsKeyword;
+    }
+
+    public static List<Response> readResponses() {
+        JSONParser parser = new JSONParser();
+        FileReader fr = null;
+        List<Response> responses = new ArrayList<>();
+        try {
+            fr = new FileReader("./app/assets/responses.json");
+            JSONArray respJSON = (JSONArray) parser.parse(fr);
+
+            for (int i = 0; i < respJSON.size(); ++i) {
+                JSONObject value = (JSONObject) respJSON.get(i);
+
+                JSONArray tagsArray = (JSONArray) value.get("tags");
+
+                Set<String> tags = new HashSet<>();
+
+                for (int j = 0; j < tagsArray.size(); ++j) {
+                    tags.add((String) tagsArray.get(j));
+                }
+
+                responses.add(new Response((String) value.get("tweet"), tags));
+            }
+
+            return responses;
+        } catch (ParseException | IOException e) {
+            Logger.error(e.toString());
+        } finally {
+            if (fr != null) {
+                try {
+                    fr.close();
+                } catch (IOException e) {
+                    Logger.error(e.toString());
+                }
+            }
+        }
+        return null;
+    }
+
+    public static void writeResponse(Response response) {
+        RandomAccessFile file;
+        try {
+            file = new RandomAccessFile("./app/assets/responses.json", "rw");
+            file.seek(file.length() - 2);
+            file.writeBytes(",\n\t{\n\t\t\"tweet\": \"");
+            file.writeBytes(response.getTweet());
+            file.writeBytes("\",\n\t\t\"tags\": [ ");
+            Iterator<String> tags = response.getTags().iterator();
+            if(tags.hasNext()) {
+                file.writeBytes("\"" + tags.next() + "\"");
+            }
+            while(tags.hasNext()) {
+                file.writeBytes(", ");
+                file.writeBytes("\"" + tags.next() + "\"");
+            }
+            file.writeBytes(" ]\n\t}\n]");
+        } catch (IOException e) {
+            Logger.error(e.toString());
+        }
     }
 
 }
