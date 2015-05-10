@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Responses {
     private List<Response> responses;
-    private int pointer = new Random().nextInt();
+    private int pointer = Math.abs(new Random().nextInt());
     private LinkedList<Response> priorityResponses;
 
     public Responses() {
