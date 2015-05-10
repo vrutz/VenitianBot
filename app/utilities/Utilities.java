@@ -6,9 +6,7 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import play.Logger;
 
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.io.*;
 import java.util.*;
 
 /**
@@ -17,7 +15,7 @@ import java.util.*;
 public class Utilities {
 
     public static String consHashtags(String keywords) {
-        if (keywords != null || " ".equals(keywords)) {
+        if (keywords != null && !" ".equals(keywords)) {
             return keywords.replaceAll(" ", " #");
         }
         return keywords;
@@ -204,10 +202,10 @@ public class Utilities {
             file.writeBytes(response.getTweet());
             file.writeBytes("\",\n\t\t\"tags\": [ ");
             Iterator<String> tags = response.getTags().iterator();
-            if(tags.hasNext()) {
+            if (tags.hasNext()) {
                 file.writeBytes("\"" + tags.next() + "\"");
             }
-            while(tags.hasNext()) {
+            while (tags.hasNext()) {
                 file.writeBytes(", ");
                 file.writeBytes("\"" + tags.next() + "\"");
             }
@@ -215,6 +213,61 @@ public class Utilities {
         } catch (IOException e) {
             Logger.error(e.toString());
         }
+    }
+
+    public static HashMap<String, Long> readTweetedUsers(String filePath) {
+        HashMap<String, Long> users = new HashMap<>();
+        String line;
+        BufferedReader br = null;
+        try {
+            br = new BufferedReader(new FileReader(filePath));
+            while ((line = br.readLine()) != null) {
+                String[] tokens = line.split(",");
+
+                users.put(tokens[0], Long.parseLong(tokens[1]));
+            }
+        } catch (FileNotFoundException e) {
+            System.err.println("File " + filePath + " not found.");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("IOException " + e.getMessage());
+            e.printStackTrace();
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.getStackTrace();
+                }
+            }
+        }
+
+        return users;
+    }
+
+    public static void writeTweetedUsers(HashMap<String, Long> users, String filePath) {
+        FileWriter writer = null;
+
+        try {
+            writer = new FileWriter(filePath, false);
+            Set<String> keySet = users.keySet();
+            for (String key : keySet) {
+                writer.append(key + "," + users.get(key) + "\n");
+            }
+            writer.flush();
+            writer.close();
+        } catch (IOException e) {
+            e.getStackTrace();
+        } finally {
+            if (writer != null) {
+                try {
+                    writer.close();
+                } catch (IOException e) {
+                    e.getStackTrace();
+                }
+            }
+        }
+
     }
 
 }

@@ -25,6 +25,7 @@ public class Global extends GlobalSettings {
     @Override
     public void onStop(Application app){
         Logger.info("Application stopped!");
+
         VenitianBot.INSTANCE.stopStream();
         VenitianBot.INSTANCE.getDB().closeConnection();
     }
