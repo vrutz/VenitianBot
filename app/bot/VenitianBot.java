@@ -29,9 +29,6 @@ public enum VenitianBot {
     private TwitterStream stream;
     private StatusDatabase db;
 
-    public final int MIN_SLEEP_TIME = 5000;
-    private int sleepTime = 5000;
-
     private LocationBox veniceLocation;
 
     private TwitterStreamListener streamListener;
@@ -116,6 +113,7 @@ public enum VenitianBot {
             Logger.info("Streaming tweets");
             initialized = true;
         }
+        Logger.info("VenitianBot initialized");
     }
 
     // TODO: refactor by putting tags and answer in a JSON file and parse it to initialize the responses
@@ -157,10 +155,6 @@ public enum VenitianBot {
         responses.addResponse(new Response(tagSet, answers[answerIndex++]));
     }
 
-    public String getScreenName() {
-        return SCREEN_NAME;
-    }
-
     public long getTwitterID() {
         return TWITTER_ID;
     }
@@ -171,6 +165,7 @@ public enum VenitianBot {
     public void streamTweets() {
         if (stream == null) {
             stream = new TwitterStreamFactory().getInstance();
+            Logger.info("Created stream observer");
         }
         stream.addListener(streamListener);
 
@@ -186,16 +181,20 @@ public enum VenitianBot {
                         veniceLocation.getSW().getLongitude()},
                 // North East corner
                 {veniceLocation.getNE().getLatitude(),
-                        veniceLocation.getNE().getLongitude()},};
+                        veniceLocation.getNE().getLongitude()}};
         filter.locations(venice);
+        // OR those directed to/from the VenitianBot
+        filter.follow(new long[]{TWITTER_ID});
 
         stream.filter(filter);
+        Logger.info("Filtering stream for english OR for the defined keywords OR from venice OR to/from the bot");
     }
 
     public void stopStream() {
         if (stream != null) {
             stream.shutdown();
             stream = null;
+            Logger.info("Stream observer shutdown");
         }
         initialized = false;
     }
@@ -279,11 +278,13 @@ public enum VenitianBot {
     }
 
     public String advertise() {
+        Logger.info("Shamelessly advertising");
         tweet(shamelessAdvertise);
         return shamelessAdvertise;
     }
 
     public String advertise(RankedStatus s) {
+        Logger.info("Shamelessly advertising");
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
         try {
             Status replied = reply(s.getContent().getId(), shamelessReply);
@@ -295,6 +296,7 @@ public enum VenitianBot {
     }
 
     public String advertise(long replyToStatusId) {
+        Logger.info("Shamelessly advertising");
         StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
         try {
             Status replied = reply(replyToStatusId, shamelessReply);
@@ -306,6 +308,7 @@ public enum VenitianBot {
     }
 
     public Status reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
+        Logger.info("Replied to status with ID: " + replyToStatusId);
         statusReply.setInReplyToStatusId(replyToStatusId);
 //        return twitter.updateStatus(statusReply);
         return null;
