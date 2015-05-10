@@ -2,7 +2,7 @@
 
 @main("VenitianBot") {
     <div class="page-header">
-        <h1>VenitianBot in action <small>See received tweets</small></h1>
+        <h1>VenitianBot in action <small>See received tweets and replies</small></h1>
     </div>
 
     <div class="col-md-6" id="results">
@@ -23,6 +23,7 @@
             var tweet;
             var list;
             if(data.user == undefined) {
+                console.log("Tweet from us");
                 tweet = "<div class=\"panel " + data.level + " reply\">" +
                         "<div class=\"panel-body\">" +
                         "<p> Tweet: " + data.content + "</p>" +
@@ -31,6 +32,7 @@
                         "</div>";
                 list = $("#replies");
             } else {
+                console.log("tweet form someone else");
                 tweet = "<div class=\"panel " + data.level + " status\">" +
                         "<div class=\"panel-heading\">" + data.user + "</div>" +
                         "<div class=\"panel-content\">" +
