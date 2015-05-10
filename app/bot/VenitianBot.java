@@ -10,6 +10,7 @@ import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
 import status.StatusDatabase;
+import tweets.TweetedUsers;
 import twitter4j.*;
 import utilities.*;
 
@@ -33,7 +34,7 @@ public enum VenitianBot {
     private boolean initialized = false;
 
     // keep users we have replied
-    private Set<String> usersTweeted = new TreeSet<>();
+    private TweetedUsers tweetedUsers = new TweetedUsers();
     private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<>();
 
     private int answerIndex = 0;
@@ -175,11 +176,10 @@ public enum VenitianBot {
             do {
                 chosenTweet = rankedTweets.poll(); // can't be empty since we
                 // add an elem just before
-            } while (usersTweeted.contains(chosenTweet.getContent().getUser()
-                    .getScreenName()));
+            } while (!tweetedUsers.isTweetable(chosenTweet.getContent().getUser().getId()));
 
             // add that we have replied already to this user
-            usersTweeted.add(chosenTweet.getContent().getUser().getScreenName());
+            tweetedUsers.addUser(chosenTweet.getContent().getUser().getId());
 
             // get the most relevant answer for this tweet
             Logger.debug("Berfore get first");
@@ -248,5 +248,12 @@ public enum VenitianBot {
 
     public List<String> getFeaturedUsers() {
         return Arrays.asList(featuredUsers);
+    }
+
+    public void stopBot() {
+        Logger.debug("Stopping the bot");
+        tweetedUsers.saveUsers();
+        stopStream();
+        getDB().closeConnection();
     }
 }

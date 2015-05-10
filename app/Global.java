@@ -11,11 +11,11 @@ import java.sql.SQLException;
  */
 public class Global extends GlobalSettings {
     @Override
-    public void onStart(Application app){
+    public void onStart(Application app) {
         Logger.info("Application started!");
         try {
             VenitianBot.INSTANCE.init();
-        } catch(SQLException e) {
+        } catch (SQLException e) {
             Logger.error("Could not create the DB");
             Logger.error(e.toString());
             Play.stop();
@@ -23,10 +23,9 @@ public class Global extends GlobalSettings {
     }
 
     @Override
-    public void onStop(Application app){
+    public void onStop(Application app) {
         Logger.info("Application stopped!");
 
-        VenitianBot.INSTANCE.stopStream();
-        VenitianBot.INSTANCE.getDB().closeConnection();
+        VenitianBot.INSTANCE.stopBot();
     }
 }

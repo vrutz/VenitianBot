@@ -9,9 +9,6 @@ import play.Logger;
 import java.io.*;
 import java.util.*;
 
-/**
- * @author zhivka
- */
 public class Utilities {
 
     public static String consHashtags(String keywords) {
@@ -215,8 +212,8 @@ public class Utilities {
         }
     }
 
-    public static HashMap<String, Long> readTweetedUsers(String filePath) {
-        HashMap<String, Long> users = new HashMap<>();
+    public static HashMap<Long, Long> readTweetedUsers(String filePath) {
+        HashMap<Long, Long> users = new HashMap<>();
         String line;
         BufferedReader br = null;
         try {
@@ -224,7 +221,7 @@ public class Utilities {
             while ((line = br.readLine()) != null) {
                 String[] tokens = line.split(",");
 
-                users.put(tokens[0], Long.parseLong(tokens[1]));
+                users.put(Long.parseLong(tokens[0]), Long.parseLong(tokens[1]));
             }
         } catch (FileNotFoundException e) {
             System.err.println("File " + filePath + " not found.");
@@ -245,13 +242,13 @@ public class Utilities {
         return users;
     }
 
-    public static void writeTweetedUsers(HashMap<String, Long> users, String filePath) {
+    public static void writeTweetedUsers(HashMap<Long, Long> users, String filePath) {
         FileWriter writer = null;
 
         try {
             writer = new FileWriter(filePath, false);
-            Set<String> keySet = users.keySet();
-            for (String key : keySet) {
+            Set<Long> keySet = users.keySet();
+            for (Long key : keySet) {
                 writer.append(key + "," + users.get(key) + "\n");
             }
             writer.flush();
