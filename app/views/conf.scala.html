@@ -28,6 +28,7 @@
             tweet: tweet
           }),
           success: function(data, status) {
+          console.log(data);
             $("#tweetAdded").css("visibility", "visible");
             setTimeout(function(){ $("#tweetAdded").hide(); }, 5000);
           },

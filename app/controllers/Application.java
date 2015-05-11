@@ -2,6 +2,7 @@ package controllers;
 
 import bot.VenitianBot;
 import com.fasterxml.jackson.databind.JsonNode;
+import play.Logger;
 import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
@@ -33,7 +34,9 @@ public class Application extends Controller {
     @BodyParser.Of(BodyParser.Json.class)
     public static Result postConfig() {
         JsonNode json = request().body().asJson();
+        Logger.debug("body of json is" + json.asText());
         String tweet = json.findValue("tweet").textValue();
+        Logger.debug("tweet to add: " + tweet);
         VenitianBot.INSTANCE.readResponses().addNewResponse(new Response(tweet));
         return ok("The tweet has successfully been added to the db.");
     }
