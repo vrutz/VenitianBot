@@ -26,6 +26,8 @@ dist
 /RUNNING_PID
 /.settings
 twitter4j.properties
+conf/application.conf
+
 
 db/*
 #tweeted users
