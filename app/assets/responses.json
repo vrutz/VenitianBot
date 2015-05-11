@@ -134,5 +134,9 @@
 	{
 		"tweet": "Did you know that the Grand Canal in Venice is 3800m long.",
 		"tags": [ "grand", "venice", "canal", "grandcanal" ]
+	},
+	{
+		"tweet": "Discover the Garzoni project: the life of apprentices and masters in modern Venice (XVI-XVIII). @Lille3 @DHLab @EPFL",
+		"tags": [ "venice" ]
 	}
 ]

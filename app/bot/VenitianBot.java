@@ -22,6 +22,7 @@ import static utilities.Utilities.*;
 public enum VenitianBot {
     INSTANCE;
 
+    private static final String SCREEN_NAME = "venitianbot";
     private static final long TWITTER_ID = 2926745097L;
     private Twitter twitter;
     private TwitterStream stream;
@@ -167,7 +168,7 @@ public enum VenitianBot {
         count++;
         RankedStatus chosenTweet;
         Logger.debug("Received tweets " + count);
-        if (count % 10 == 0) {
+        if (count % 50 == 0) {
             Logger.debug("In if");
 
             do {
@@ -255,5 +256,9 @@ public enum VenitianBot {
         tweetedUsers.saveUsers();
         stopStream();
         getDB().closeConnection();
+    }
+
+    public String getScreenName() {
+        return SCREEN_NAME;
     }
 }

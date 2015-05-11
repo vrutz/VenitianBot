@@ -11,28 +11,34 @@
         console.log("size of tweet is too big!");
         button.removeClass("btn-success");
         button.removeClass("btn-default");
-        button.toggleClass("btn-danger");
+        button.addClass("btn-danger");
         div.removeClass("has-success");
-        div.toggleClass("has-error");
+        div.addClass("has-error");
       } else {
         console.log("size of tweet is ok!");
         button.removeClass("btn-danger");
         button.removeClass("btn-default");
-        button.toggleClass("btn-success");
+        button.addClass("btn-success");
         div.removeClass("has-error");
-        div.toggleClass("has-success");
+        div.addClass("has-success");
         // TODO: send tweet to application
-        $.post({
-          url: "/add_tweet",
+        $.ajax({
+          method: "POST",
+          url: "/conf",
+          contentType: "text/json",
           data: JSON.stringify({
-            tweet: tweet
+            "tweet": tweet
           }),
           success: function(data, status) {
           console.log(data);
             $("#tweetAdded").css("visibility", "visible");
             setTimeout(function(){ $("#tweetAdded").hide(); }, 5000);
           },
-          dataType: "application/json; charset=utf-8"
+          error: function(xhr, status, err){
+          console.log(xhr.statusCode());
+          console.log(status);
+          console.log(err);
+          }
         });
       }
     }

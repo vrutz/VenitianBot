@@ -49,7 +49,8 @@ public class TwitterStreamListener implements StatusListener {
             }
         }
 
-        if (arg0.getInReplyToUserId() == VenitianBot.INSTANCE.getTwitterID()) {
+        if (arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "")
+                .equals(VenitianBot.INSTANCE.getScreenName())) {
             String reply = VenitianBot.INSTANCE.advertise(status);
             Logger.info("Advertised " + reply + " in response to " + arg0.getText());
         }
