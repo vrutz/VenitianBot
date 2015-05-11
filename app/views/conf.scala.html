@@ -22,6 +22,17 @@
         div.removeClass("has-error");
         div.toggleClass("has-success");
         // TODO: send tweet to application
+        $.post({
+          url: "/add_tweet",
+          data: JSON.stringify({
+            tweet: tweet
+          }),
+          success: function(data, status) {
+            $("#tweetAdded").css("visibility", "visible");
+            setTimeout(function(){ $("#tweetAdded").hide(); }, 5000);
+          },
+          dataType: "application/json; charset=utf-8"
+        });
       }
     }
   </script>
@@ -35,4 +46,7 @@
       </div><!-- /input-group -->
     </div><!-- /.col-lg-6 -->
   </div><!-- /.row -->
+  <div class="row" id="tweetAdded">
+    <div class="alert alert-success" role="alert">Tweet has been added to the database! :)</div>
+  </div>
 }

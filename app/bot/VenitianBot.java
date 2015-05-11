@@ -22,7 +22,6 @@ import static utilities.Utilities.*;
 public enum VenitianBot {
     INSTANCE;
 
-    private static final String SCREEN_NAME = "VenitianBot";
     private static final long TWITTER_ID = 2926745097L;
     private Twitter twitter;
     private TwitterStream stream;
@@ -36,8 +35,6 @@ public enum VenitianBot {
     // keep users we have replied
     private TweetedUsers tweetedUsers = new TweetedUsers();
     private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<>();
-
-    private int answerIndex = 0;
 
     // replies
     private int count = 0;
@@ -187,9 +184,10 @@ public enum VenitianBot {
             Logger.debug("Got answer " + answer);
 
 
-            StatusUpdate statusReply = new StatusUpdate(answer.getTweet());
+            String statusReply = "@" + chosenTweet.getContent().getUser().getScreenName() +
+                            " " + answer.getTweet();
             try {
-                Logger.debug("preparing reply: " + statusReply.getStatus());
+                Logger.debug("preparing reply: " + statusReply);
                 String replied = reply(chosenTweet.getContent().getId(), statusReply);
 
                 SimpleStatus simpleReply =
@@ -220,9 +218,9 @@ public enum VenitianBot {
 
     public String advertise(RankedStatus s) {
         Logger.info("Shamelessly advertising");
-        StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
         try {
-            String replied = reply(s.getContent().getId(), shamelessReply);
+            String replied = reply(s.getContent().getId(),
+                    "@" + s.getContent().getUser().getScreenName() + " " + shamelessAdvertise);
             return replied;
         } catch (TwitterException e) {
             Logger.error("Could not advertise shamelessly: " + e.getErrorMessage());
@@ -230,11 +228,10 @@ public enum VenitianBot {
         return null;
     }
 
-    public String advertise(long replyToStatusId) {
+    public String advertise(long replyToStatusId, String screenName) {
         Logger.info("Shamelessly advertising");
-        StatusUpdate shamelessReply = new StatusUpdate(shamelessAdvertise);
         try {
-            String replied = reply(replyToStatusId, shamelessReply);
+            String replied = reply(replyToStatusId, "@"+ screenName + " "+ shamelessAdvertise);
             return replied;
         } catch (TwitterException e) {
             Logger.error("Could not advertise shamelessly: " + e.getErrorMessage());
@@ -242,10 +239,11 @@ public enum VenitianBot {
         return null;
     }
 
-    public String reply(long replyToStatusId, StatusUpdate statusReply) throws TwitterException {
+    public String reply(long replyToStatusId, String statusReply) throws TwitterException {
         Logger.info("Replied to status with ID: " + replyToStatusId);
-        statusReply.setInReplyToStatusId(replyToStatusId);
-        return twitter.updateStatus(statusReply).getText();
+        StatusUpdate update = new StatusUpdate(statusReply);
+        update.setInReplyToStatusId(replyToStatusId);
+        return twitter.updateStatus(update).getText();
     }
 
     public List<String> getFeaturedUsers() {

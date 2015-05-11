@@ -1,9 +1,12 @@
 package controllers;
 
 import bot.VenitianBot;
+import com.fasterxml.jackson.databind.JsonNode;
+import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.WebSocket;
+import utilities.Response;
 import views.html.display_tweets;
 import views.html.index;
 
@@ -25,5 +28,13 @@ public class Application extends Controller {
 
     public static Result config() {
         return ok(views.html.conf.render());
+    }
+
+    @BodyParser.Of(BodyParser.Json.class)
+    public static Result postConfig() {
+        JsonNode json = request().body().asJson();
+        String tweet = json.findValue("tweet").textValue();
+        VenitianBot.INSTANCE.readResponses().addNewResponse(new Response(tweet));
+        return ok("The tweet has successfully been added to the db.");
     }
 }
