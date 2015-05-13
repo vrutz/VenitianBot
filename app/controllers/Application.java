@@ -8,7 +8,7 @@ import play.mvc.BodyParser;
 import play.mvc.Controller;
 import play.mvc.Result;
 import play.mvc.WebSocket;
-import utilities.Response;
+import tweets.Response;
 import views.html.display_tweets;
 import views.html.index;
 
@@ -16,6 +16,7 @@ public class Application extends Controller {
 
     /**
      * Index page. Not useful for the bot though
+     *
      * @return the HTTP response with the index page
      */
     public static Result index() {
@@ -24,6 +25,7 @@ public class Application extends Controller {
 
     /**
      * Page where we display all the received tweets and the tweets the bot replies to and with.
+     *
      * @return the HTTP response with the display_tweets page
      */
     public static Result displayTweets() {
@@ -32,6 +34,7 @@ public class Application extends Controller {
 
     /**
      * Creates a new Web socket from the new connection to display_tweets
+     *
      * @return the WebSocket in which browser and server will communicate
      */
     public static WebSocket<String> getSocket() {
@@ -42,6 +45,7 @@ public class Application extends Controller {
 
     /**
      * The configuration page for the bot
+     *
      * @return the HTTP response with the conf page
      */
     public static Result config() {
@@ -50,6 +54,7 @@ public class Application extends Controller {
 
     /**
      * HTTP POST request for modifying the configuration
+     *
      * @return the HTTP OK response if all goes well
      */
 //    @BodyParser.Of(BodyParser.Json.class)

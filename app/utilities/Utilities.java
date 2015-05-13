@@ -5,6 +5,10 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import play.Logger;
+import tweets.Location;
+import tweets.LocationBox;
+import tweets.Place;
+import tweets.Response;
 
 import java.io.*;
 import java.util.*;

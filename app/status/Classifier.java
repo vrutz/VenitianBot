@@ -7,8 +7,8 @@ import play.Logger;
 
 import twitter4j.Status;
 import utilities.JSONReader;
-import utilities.LocationBox;
-import utilities.Place;
+import tweets.LocationBox;
+import tweets.Place;
 
 public class Classifier {
     private static Place[] places;

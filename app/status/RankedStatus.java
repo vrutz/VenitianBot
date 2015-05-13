@@ -5,7 +5,7 @@ import java.util.Set;
 
 import bot.VenitianBot;
 import twitter4j.Status;
-import utilities.Location;
+import tweets.Location;
 
 /**
  * Encapsulates the content of a fetched status, after processing, together with
@@ -21,7 +21,6 @@ public class RankedStatus implements Comparable<RankedStatus> {
     private Set<String> tags;
     private boolean isRelevant;
     private boolean isFeatured;
-
 
 
     public RankedStatus(Status content) {
@@ -95,7 +94,9 @@ public class RankedStatus implements Comparable<RankedStatus> {
         return isRelevant && rank != 100;
     }
 
-    public boolean isFeatured() { return isFeatured; }
+    public boolean isFeatured() {
+        return isFeatured;
+    }
 
     public void setRelevance(boolean relevant) {
         isRelevant = relevant;

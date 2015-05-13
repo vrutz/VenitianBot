@@ -1,4 +1,6 @@
-package utilities;
+package tweets;
+
+import tweets.Location;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -6,7 +8,7 @@ import java.util.Set;
 public class Place extends Location {
     private Set<String> tags;
 
-    Place(String name, Set<String> tags, double latitude, double longitude, double radius) {
+    public Place(String name, Set<String> tags, double latitude, double longitude, double radius) {
         super(name, latitude, longitude, radius);
         this.tags = tags;
     }
