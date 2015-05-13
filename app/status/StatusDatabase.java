@@ -14,6 +14,7 @@ import java.util.List;
 
 /**
  * Created by Valentin on 08/04/15.
+ * This class represents the database into which we store the tweets we ranked as interesting
  */
 public class StatusDatabase {
 
@@ -35,6 +36,10 @@ public class StatusDatabase {
         connection = DB.getConnection();
     }
 
+    /**
+     * Initializes the table in the database
+     * @return the databse object (this)
+     */
     public StatusDatabase init() {
         try {
             connection.createStatement().execute(
@@ -56,6 +61,9 @@ public class StatusDatabase {
         return this;
     }
 
+    /**
+     * Closes the connection to the database
+     */
     public void closeConnection() {
         try {
             connection.close();
@@ -65,6 +73,10 @@ public class StatusDatabase {
         }
     }
 
+    /**
+     * Removes all the tweets form the table
+     * @return true if all rows where removed, false otherwise
+     */
     public boolean clean() {
         try {
             connection.createStatement().execute("DELETE FROM " + TABLE_NAME);
@@ -76,6 +88,10 @@ public class StatusDatabase {
         return true;
     }
 
+    /**
+     * Drops the table itself
+     * @return true if the table was dropped successfully, false otherwise
+     */
     public boolean drop() {
         try {
             connection.createStatement().execute("DROP TABLE " + TABLE_NAME);
@@ -87,6 +103,17 @@ public class StatusDatabase {
         return true;
     }
 
+    /**
+     * Adds a row representing a tweet to the table
+     * @param user the user of the interesting tweet
+     * @param date the date of the interesting tweet
+     * @param content the content of the interesting tweet
+     * @param favCount the favorite count of the interesting tweet
+     * @param retwtCount the retweet count of the interesting tweet
+     * @param loc the location of the interesting tweet
+     * @param rank the rank of the interesting tweet
+     * @return true if the tweet was inserted successfully, false otherwise
+     */
     public boolean insertIntoDB(String user, Date date, String content,
                                 int favCount, int retwtCount, Location loc,
                                 int rank) {
@@ -120,6 +147,11 @@ public class StatusDatabase {
         return true;
     }
 
+    /**
+     * Inserts a RankedStatus into the table
+     * @param status the RankedStatus to add to the table
+     * @return true if the tweet was inserted successfully, false otherwise
+     */
     public boolean insertIntoDB(RankedStatus status) {
         Status tweet = status.getContent();
         return insertIntoDB(
@@ -129,6 +161,9 @@ public class StatusDatabase {
                 status.getLocation(), status.getRank());
     }
 
+    /**
+     * @return all tweets in the table
+     */
     public List<SimpleStatus> getTweets() { // since has format "dd-MM-yyyy"
         List<SimpleStatus> statuses = new ArrayList<>();
         try {
