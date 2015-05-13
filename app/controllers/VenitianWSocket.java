@@ -7,10 +7,18 @@ import play.Logger;
 
 /**
  * Created by Valentin on 14/04/15.
+ * This class represents the websocket through which the browser client-side and the server communicate.
+ * This is mostly used for sending tweets to display to the interface
  */
 public class VenitianWSocket extends WebSocket<String> {
     private Out<String> out;
 
+    /**
+     * This callback is activated when the websocket is ready to be used
+     * We add a callback to the socket so that when one of the streams is closed, then we close the socket
+     * @param in the In stream (client -> server)
+     * @param out the Out stream (server -> client)
+     */
     @Override
     public void onReady(In<String> in, Out<String> out) {
         Logger.debug("Connected");
@@ -31,6 +39,10 @@ public class VenitianWSocket extends WebSocket<String> {
         this.out = out;
     }
 
+    /**
+     * Sends a message from server to client through the socket
+     * @param htmlStatus the status as HTML to be sent to the client
+     */
     public void sendMessage(String htmlStatus) {
         out.write(htmlStatus);
     }

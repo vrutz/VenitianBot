@@ -2,7 +2,6 @@ import bot.VenitianBot;
 import play.Application;
 import play.GlobalSettings;
 import play.Logger;
-import play.api.Play;
 import play.api.mvc.Results;
 import play.libs.F;
 import play.libs.Scala;
@@ -12,42 +11,51 @@ import play.mvc.Result;
 import scala.Tuple2;
 import scala.collection.Seq;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static play.core.j.JavaResults.BadRequest;
-import static play.core.j.JavaResults.InternalServerError;
-import static play.core.j.JavaResults.NotFound;
+import static play.core.j.JavaResults.*;
 
 /**
  * Created by Valentin on 01/04/15.
+ * These are the settings of the Play application
+ * Mostly callbacks for when a page is loaded and requests received
  */
+@SuppressWarnings("unused")
 public class Global extends GlobalSettings {
+
+    /**
+     * Called when someone loads a page
+     * @param app the Play application
+     */
     @Override
     public void onStart(Application app) {
         Logger.info("Application started!");
-        try {
-            VenitianBot.INSTANCE.init();
-        } catch (SQLException e) {
-            Logger.error("Could not create the DB");
-            Logger.error(e.toString());
-            Play.stop();
-        }
+        VenitianBot.INSTANCE.init();
     }
 
+    /**
+     * Called when someone closes a page
+     * @param app the Play application
+     */
     @Override
     public void onStop(Application app) {
         Logger.info("Application stopped!");
-
         VenitianBot.INSTANCE.stopBot();
     }
 
+    /**
+     * Request wrapper that adds the "Access-Control-Allow-Origin: *" header to each request going out.
+     * Mandatory for CORS (when the client uses HTTP actions other than GET like POST)
+     */
     private class ActionWrapper extends Action.Simple {
         public ActionWrapper(Action<?> action) {
             this.delegate = action;
         }
 
+        /**
+         * Adds the CORS header to the response
+         */
         @Override
         public F.Promise<Result> call(Http.Context ctx) throws java.lang.Throwable {
             F.Promise<Result> result = this.delegate.call(ctx);
@@ -57,7 +65,7 @@ public class Global extends GlobalSettings {
         }
     }
 
-    /*
+    /**
      * Adds the required CORS header "Access-Control-Allow-Origin" to successfull requests
      */
     @Override
@@ -69,8 +77,8 @@ public class Global extends GlobalSettings {
         final private play.api.mvc.Result wrappedResult;
 
         public CORSResult(Results.Status status) {
-            List<Tuple2<String, String>> list = new ArrayList<Tuple2<String, String>>();
-            Tuple2<String, String> t = new Tuple2<String, String>("Access-Control-Allow-Origin","*");
+            List<Tuple2<String, String>> list = new ArrayList<>();
+            Tuple2<String, String> t = new Tuple2<>("Access-Control-Allow-Origin","*");
             list.add(t);
             Seq<Tuple2<String, String>> seq = Scala.toSeq(list);
             wrappedResult = status.withHeaders(seq);
@@ -81,7 +89,7 @@ public class Global extends GlobalSettings {
         }
     }
 
-    /*
+    /**
     * Adds the required CORS header "Access-Control-Allow-Origin" to bad requests
     */
     @Override
@@ -89,7 +97,7 @@ public class Global extends GlobalSettings {
         return F.Promise.<Result>pure(new CORSResult(BadRequest()));
     }
 
-    /*
+    /**
     * Adds the required CORS header "Access-Control-Allow-Origin" to requests that causes an exception
     */
     @Override
@@ -97,7 +105,7 @@ public class Global extends GlobalSettings {
         return F.Promise.<Result>pure(new CORSResult(InternalServerError()));
     }
 
-    /*
+    /**
     * Adds the required CORS header "Access-Control-Allow-Origin" when a route was not found
     */
     @Override
