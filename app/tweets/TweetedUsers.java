@@ -1,6 +1,8 @@
 package tweets;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -53,11 +55,11 @@ public class TweetedUsers {
      * This function removes the outdated users i.e. users that have not been tweeted in more than 2 days (can change)
      */
     public void cleanUsers() {
-        Set<Long> userIDs = users.keySet();
-
-        for (Long userID : userIDs) {
-            if (users.get(userID) < System.currentTimeMillis() - FREEZE_TIME) {
-                users.remove(userID);
+        Iterator<Map.Entry<Long, Long>> iter = users.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry<Long, Long> entry = iter.next();
+            if(entry.getValue() < System.currentTimeMillis() - FREEZE_TIME) {
+                iter.remove();
             }
         }
     }
