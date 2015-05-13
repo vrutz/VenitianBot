@@ -34,7 +34,7 @@ public enum VenitianBot {
     private boolean initialized = false;
 
     // keep users we have replied
-    private TweetedUsers tweetedUsers = new TweetedUsers();
+    private TweetedUsers tweetedUsers;
     private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<>();
 
     // replies
@@ -61,6 +61,7 @@ public enum VenitianBot {
         if (!initialized) {
             twitter = TwitterFactory.getSingleton();
             veniceLocation = JSONReader.veniceLocation;
+            tweetedUsers = new TweetedUsers();
 
             Classifier.init();
             Logger.info("Classifier initialized");
