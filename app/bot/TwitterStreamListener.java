@@ -17,7 +17,7 @@ import java.util.List;
 
 public class TwitterStreamListener implements StatusListener {
 
-    private List<VenitianWSocket> sockets;
+    List<VenitianWSocket> sockets;
 
     public TwitterStreamListener() {
         sockets = new ArrayList<VenitianWSocket>();
