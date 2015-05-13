@@ -17,12 +17,20 @@ import java.util.List;
 
 public class TwitterStreamListener implements StatusListener {
 
-    List<VenitianWSocket> sockets;
+    private List<VenitianWSocket> sockets;
 
     public TwitterStreamListener() {
         sockets = new ArrayList<VenitianWSocket>();
     }
 
+    /**
+     * Called each time a status corresponding to the filter given in VenitianBot.streamTweets() is sent
+     * from the Twitter Streaming API to our Bot.
+     * If the tweet is from a featured user, we retweet.
+     * If it is relevant, we send it to the Web interface and reply to it
+     * If it is a reply to us, we advertise ourselves shamelessly
+     * @param arg0 the status received
+     */
     @Override
     public void onStatus(Status arg0) {
         Logger.debug(arg0.getUser().getScreenName());
@@ -58,30 +66,61 @@ public class TwitterStreamListener implements StatusListener {
 
     }
 
+    /**
+     * Adds a websocket to the stream when a new connection is opened.
+     * This happens when a new user opens venetianbot.tk:8080/tweets
+     * @param socket the websocket to add
+     * @return true if the socket was successfully added to the list, false otherwise
+     */
     public boolean addWSocket(VenitianWSocket socket) {
         return sockets.add(socket);
     }
 
+    /**
+     * This is calls when the connection is closed, i.e. tab is closed
+     * So we remove the websocket snice we won't send updates anymore to that client
+     * @param socket the socket to remove
+     */
     public void removeWSocket(VenitianWSocket socket) {
         sockets.remove(socket);
     }
 
+    /**
+     * not overriden
+     * @param arg0 not overriden
+     */
     @Override
     public void onException(Exception arg0) {
     }
 
+    /**
+     * not overriden
+     * @param arg0 not overriden
+     */
     @Override
     public void onDeletionNotice(StatusDeletionNotice arg0) {
     }
 
+    /**
+     * not overriden
+     * @param arg0 not overriden
+     */
     @Override
     public void onScrubGeo(long arg0, long arg1) {
     }
 
+    /**
+     * not overriden
+     * @param arg0 not overriden
+     */
     @Override
     public void onStallWarning(StallWarning arg0) {
     }
 
+    /**
+     * not overriden
+     * @param arg0 not overriden
+     */
     @Override
     public void onTrackLimitationNotice(int arg0) {
     }
