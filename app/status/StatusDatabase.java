@@ -35,7 +35,7 @@ public class StatusDatabase {
         connection = DB.getConnection();
     }
 
-    public StatusDatabase init() throws SQLException {
+    public StatusDatabase init() {
         try {
             connection.createStatement().execute(
                     "CREATE TABLE " + TABLE_NAME + " (" +

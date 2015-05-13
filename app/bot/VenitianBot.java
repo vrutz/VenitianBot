@@ -3,9 +3,6 @@ package bot;
 import controllers.VenitianWSocket;
 import play.Logger;
 import play.libs.Json;
-
-import java.util.List;
-
 import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
@@ -14,10 +11,13 @@ import tweets.TweetedUsers;
 import twitter4j.*;
 import utilities.*;
 
-import java.sql.SQLException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.PriorityQueue;
 
-import static utilities.Utilities.*;
+import static utilities.Utilities.readFeaturedUsers;
+import static utilities.Utilities.readKeywords;
 
 public enum VenitianBot {
     INSTANCE;
@@ -49,15 +49,29 @@ public enum VenitianBot {
 
     private String[] featuredUsers = readFeaturedUsers();
 
+    /**
+     *
+     * @return the twitter stream listener where we filter tweets and reply to some, etc ...
+     */
     public TwitterStreamListener getStreamListener() {
         return streamListener;
     }
 
+    /**
+     *
+     * @return a connection to the DB where we keep received tweets
+     */
     public StatusDatabase getDB() {
         return db;
     }
 
-    public void init() throws SQLException {
+    /**
+     * Initializes the VenitianBot!
+     * It connects to Twitter, get the list of users we tweeted to, initializes the database if not already,
+     * initializes the classifier that will rank each received tweets and launches the stream listener from
+     * the Twitter Streaming API to receive the interesting tweets.
+     */
+    public void init() {
         if (!initialized) {
             twitter = TwitterFactory.getSingleton();
             veniceLocation = JSONReader.veniceLocation;
@@ -78,6 +92,10 @@ public enum VenitianBot {
         Logger.info("VenitianBot initialized");
     }
 
+    /**
+     * Reads from assets/responses.json the pre-registered responses to the filtered interesting tweets
+     * @return a list of Reponse from the assets/responses.json file
+     */
     public Responses readResponses() {
         Responses newResponses = new Responses();
         List<Response> respList = Utilities.readResponses();
@@ -88,12 +106,21 @@ public enum VenitianBot {
         return newResponses;
     }
 
+    /**
+     *
+     * @return the Twitter ID of the VenitianBot
+     */
     public long getTwitterID() {
         return TWITTER_ID;
     }
 
     /**
-     *
+     * This method will create the filter for the tweets we want, currently:
+     *      - Language is english
+     *      - Tracking keywords from assets/query.json @ hashtags
+     *      - Location in Venice: We give the latitude/longitude location of the South-West corner, the location of
+     *                            the North-East corner and it will give us the tweets from inside that box.
+     *      - Tweets from/to the VenitianBot (mainly for shameless advertising)
      */
     public void streamTweets() {
         if (stream == null) {
@@ -123,6 +150,9 @@ public enum VenitianBot {
         Logger.info("Filtering stream for english OR for the defined keywords OR from venice OR to/from the bot");
     }
 
+    /**
+     *  Stops the stream from giving us tweets
+     */
     public void stopStream() {
         if (stream != null) {
             stream.shutdown();
@@ -146,6 +176,10 @@ public enum VenitianBot {
         Logger.info("Status updated to: " + status);
     }
 
+    /**
+     * Retweets a tweet
+     * @param statusID the tweet to retweet
+     */
     public void retweet(long statusID) {
         try {
             twitter.retweetStatus(statusID);
@@ -212,12 +246,21 @@ public enum VenitianBot {
 
     }
 
+    /**
+     * Advertises the VenitianBot, link to the Google Form for more feedback from the users
+     * @return the string used to tweet the advertising
+     */
     public String advertise() {
         Logger.info("Shamelessly advertising");
         tweet(shamelessAdvertise);
         return shamelessAdvertise;
     }
 
+    /**
+     * Advertises the VenitianBot, link to the Google Form for more feedback from the users
+     * @param s the tweet directed to us to which we want to reply with the advertising
+     * @return the string used to tweet the advertising
+     */
     public String advertise(RankedStatus s) {
         Logger.info("Shamelessly advertising");
         try {
@@ -230,17 +273,13 @@ public enum VenitianBot {
         return null;
     }
 
-    public String advertise(long replyToStatusId, String screenName) {
-        Logger.info("Shamelessly advertising");
-        try {
-            String replied = reply(replyToStatusId, "@"+ screenName + " "+ shamelessAdvertise);
-            return replied;
-        } catch (TwitterException e) {
-            Logger.error("Could not advertise shamelessly: " + e.getErrorMessage());
-        }
-        return null;
-    }
-
+    /**
+     * This method replies to a tweet
+     * @param replyToStatusId the ID of the tweet we want to reply to
+     * @param statusReply the string we want to reply with
+     * @return the tweet sent
+     * @throws TwitterException if the Twitter Objetc could not tweet (Authentication Error or else)
+     */
     public String reply(long replyToStatusId, String statusReply) throws TwitterException {
         Logger.info("Replied to status with ID: " + replyToStatusId);
         StatusUpdate update = new StatusUpdate(statusReply);
@@ -248,10 +287,17 @@ public enum VenitianBot {
         return twitter.updateStatus(update).getText();
     }
 
+    /**
+     * Contains a list of important users that we will retweet each time
+     * @return the list of featured users
+     */
     public List<String> getFeaturedUsers() {
         return Arrays.asList(featuredUsers);
     }
 
+    /**
+     * Safe method to stop the bot
+     */
     public void stopBot() {
         Logger.debug("Stopping the bot");
         tweetedUsers.saveUsers();
@@ -259,6 +305,10 @@ public enum VenitianBot {
         getDB().closeConnection();
     }
 
+    /**
+     * The screen name of the VenitianBot (the one appearing on twitter.com)
+     * @return the screen name of the VenitianBot
+     */
     public String getScreenName() {
         return SCREEN_NAME;
     }
