@@ -205,7 +205,7 @@ public enum VenitianBot {
         count++;
         RankedStatus chosenTweet;
         Logger.debug("Received tweets " + count);
-        if (count % 50 == 0) {
+        if (count % 150 == 0) {
             Logger.debug("In if");
 
             do {
