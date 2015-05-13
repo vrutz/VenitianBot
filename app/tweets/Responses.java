@@ -1,4 +1,6 @@
-package utilities;
+package tweets;
+
+import utilities.Utilities;
 
 import java.util.*;
 

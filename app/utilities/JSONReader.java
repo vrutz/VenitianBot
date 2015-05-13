@@ -1,5 +1,8 @@
 package utilities;
 
+import tweets.LocationBox;
+import tweets.Place;
+
 /**
  * Created by mathieu on 10/05/15.
  */

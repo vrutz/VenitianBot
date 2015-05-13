@@ -7,6 +7,9 @@ import status.Classifier;
 import status.RankedStatus;
 import status.SimpleStatus;
 import status.StatusDatabase;
+import tweets.LocationBox;
+import tweets.Response;
+import tweets.Responses;
 import tweets.TweetedUsers;
 import twitter4j.*;
 import utilities.*;
@@ -50,7 +53,6 @@ public enum VenitianBot {
     private String[] featuredUsers = readFeaturedUsers();
 
     /**
-     *
      * @return the twitter stream listener where we filter tweets and reply to some, etc ...
      */
     public TwitterStreamListener getStreamListener() {
@@ -58,7 +60,6 @@ public enum VenitianBot {
     }
 
     /**
-     *
      * @return a connection to the DB where we keep received tweets
      */
     public StatusDatabase getDB() {
@@ -94,6 +95,7 @@ public enum VenitianBot {
 
     /**
      * Reads from assets/responses.json the pre-registered responses to the filtered interesting tweets
+     *
      * @return a list of Reponse from the assets/responses.json file
      */
     public Responses readResponses() {
@@ -107,7 +109,6 @@ public enum VenitianBot {
     }
 
     /**
-     *
      * @return the Twitter ID of the VenitianBot
      */
     public long getTwitterID() {
@@ -116,11 +117,11 @@ public enum VenitianBot {
 
     /**
      * This method will create the filter for the tweets we want, currently:
-     *      - Language is english
-     *      - Tracking keywords from assets/query.json @ hashtags
-     *      - Location in Venice: We give the latitude/longitude location of the South-West corner, the location of
-     *                            the North-East corner and it will give us the tweets from inside that box.
-     *      - Tweets from/to the VenitianBot (mainly for shameless advertising)
+     * - Language is english
+     * - Tracking keywords from assets/query.json @ hashtags
+     * - Location in Venice: We give the latitude/longitude location of the South-West corner, the location of
+     * the North-East corner and it will give us the tweets from inside that box.
+     * - Tweets from/to the VenitianBot (mainly for shameless advertising)
      */
     public void streamTweets() {
         if (stream == null) {
@@ -151,7 +152,7 @@ public enum VenitianBot {
     }
 
     /**
-     *  Stops the stream from giving us tweets
+     * Stops the stream from giving us tweets
      */
     public void stopStream() {
         if (stream != null) {
@@ -178,6 +179,7 @@ public enum VenitianBot {
 
     /**
      * Retweets a tweet
+     *
      * @param statusID the tweet to retweet
      */
     public void retweet(long statusID) {
@@ -221,7 +223,7 @@ public enum VenitianBot {
 
 
             String statusReply = "@" + chosenTweet.getContent().getUser().getScreenName() +
-                            " " + answer.getTweet();
+                    " " + answer.getTweet();
             try {
                 Logger.debug("preparing reply: " + statusReply);
                 String replied = reply(chosenTweet.getContent().getId(), statusReply);
@@ -248,6 +250,7 @@ public enum VenitianBot {
 
     /**
      * Advertises the VenitianBot, link to the Google Form for more feedback from the users
+     *
      * @return the string used to tweet the advertising
      */
     public String advertise() {
@@ -258,6 +261,7 @@ public enum VenitianBot {
 
     /**
      * Advertises the VenitianBot, link to the Google Form for more feedback from the users
+     *
      * @param s the tweet directed to us to which we want to reply with the advertising
      * @return the string used to tweet the advertising
      */
@@ -273,10 +277,12 @@ public enum VenitianBot {
         return null;
     }
 
+
     /**
      * This method replies to a tweet
+     *
      * @param replyToStatusId the ID of the tweet we want to reply to
-     * @param statusReply the string we want to reply with
+     * @param statusReply     the string we want to reply with
      * @return the tweet sent
      * @throws TwitterException if the Twitter Objetc could not tweet (Authentication Error or else)
      */
@@ -289,6 +295,7 @@ public enum VenitianBot {
 
     /**
      * Contains a list of important users that we will retweet each time
+     *
      * @return the list of featured users
      */
     public List<String> getFeaturedUsers() {
@@ -298,6 +305,7 @@ public enum VenitianBot {
     /**
      * Safe method to stop the bot
      */
+
     public void stopBot() {
         Logger.debug("Stopping the bot");
         tweetedUsers.saveUsers();
@@ -307,6 +315,7 @@ public enum VenitianBot {
 
     /**
      * The screen name of the VenitianBot (the one appearing on twitter.com)
+     *
      * @return the screen name of the VenitianBot
      */
     public String getScreenName() {

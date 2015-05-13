@@ -1,4 +1,6 @@
-package utilities;
+package tweets;
+
+import utilities.JSONReader;
 
 import java.util.HashSet;
 import java.util.Iterator;
@@ -73,14 +75,14 @@ public class Response implements Comparable<Response> {
     private Set<String> extractTags() {
         Set<String> tags = new HashSet<>();
 
-        for(String keyWord: JSONReader.keyWords) {
-            if(tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
+        for (String keyWord : JSONReader.keyWords) {
+            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
                 tags.add(keyWord);
             }
         }
 
-        for(String keyWord: JSONReader.keyWordsGeneral) {
-            if(tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
+        for (String keyWord : JSONReader.keyWordsGeneral) {
+            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
                 tags.add(keyWord);
             }
         }
@@ -94,11 +96,11 @@ public class Response implements Comparable<Response> {
         strBuilder.append("{");
 
         Iterator<String> iter = tags.iterator();
-        if(iter.hasNext()) {
+        if (iter.hasNext()) {
             strBuilder.append(iter.next());
         }
 
-        while(iter.hasNext()) {
+        while (iter.hasNext()) {
             strBuilder.append(", ").append(iter.next());
         }
 

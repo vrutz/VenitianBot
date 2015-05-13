@@ -3,7 +3,7 @@ package status;
 import play.Logger;
 import play.db.DB;
 import twitter4j.Status;
-import utilities.Location;
+import tweets.Location;
 
 import java.sql.*;
 import java.text.DateFormat;

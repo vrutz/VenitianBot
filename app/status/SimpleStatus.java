@@ -3,7 +3,7 @@ package status;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import play.libs.Json;
 import twitter4j.Status;
-import utilities.Location;
+import tweets.Location;
 
 import java.sql.Date;
 
@@ -77,11 +77,11 @@ public class SimpleStatus {
     }
 
     private String getLevel() {
-        if(RANK > 80) {
-            return"panel-danger";
-        } else if(RANK > 50) {
+        if (RANK > 80) {
+            return "panel-danger";
+        } else if (RANK > 50) {
             return "panel-warning";
-        } else if(RANK > 30) {
+        } else if (RANK > 30) {
             return "panel-info";
         } else {
             return "panel-success";

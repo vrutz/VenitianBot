@@ -1,4 +1,6 @@
-package utilities;
+package tweets;
+
+import tweets.Location;
 
 import java.util.HashSet;
 import java.util.Set;
