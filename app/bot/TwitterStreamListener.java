@@ -36,14 +36,14 @@ public class TwitterStreamListener implements StatusListener {
         Logger.debug(arg0.getUser().getScreenName());
         RankedStatus status = Classifier.classify(arg0);
 
-        if (status.isFeatured()) {
-            VenitianBot.INSTANCE.retweet(status.getContent().getId());
-        }/* else if(arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "")
-                .equals(VenitianBot.INSTANCE.getScreenName()) ||
-                arg0.getText().startsWith("@" + VenitianBot.INSTANCE.getScreenName())) {
+        if(arg0.getText().toLowerCase().contains("@" + VenitianBot.INSTANCE.getScreenName())) {
             String reply = VenitianBot.INSTANCE.advertise(status);
             Logger.info("Advertised " + reply + " in response to " + arg0.getText());
-        } else */if (status.isRelevant()) {
+        } else if (status.isFeatured()) {
+            VenitianBot.INSTANCE.retweet(status.getContent().getId());
+        }
+
+        if (status.isRelevant()) {
             Logger.info("Status ranked " + status.getRank() +
                     ", from: " + status.getContent().getUser().getScreenName());
             Logger.info("\t" + status.getContent().getText());
@@ -62,6 +62,7 @@ public class TwitterStreamListener implements StatusListener {
             }
         }
     }
+
 
     /**
      * Adds a websocket to the stream when a new connection is opened.
