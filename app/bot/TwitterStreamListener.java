@@ -38,6 +38,11 @@ public class TwitterStreamListener implements StatusListener {
 
         if (status.isFeatured()) {
             VenitianBot.INSTANCE.retweet(status.getContent().getId());
+        } else if(arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "")
+                .equals(VenitianBot.INSTANCE.getScreenName()) ||
+                arg0.getText().startsWith("@" + VenitianBot.INSTANCE.getScreenName())) {
+            String reply = VenitianBot.INSTANCE.advertise(status);
+            Logger.info("Advertised " + reply + " in response to " + arg0.getText());
         } else if (status.isRelevant()) {
             Logger.info("Status ranked " + status.getRank() +
                     ", from: " + status.getContent().getUser().getScreenName());
@@ -56,14 +61,6 @@ public class TwitterStreamListener implements StatusListener {
                 socket.sendMessage(Json.stringify(htmlStatus));
             }
         }
-
-        if (arg0.getInReplyToScreenName().toLowerCase().replaceAll(" ", "")
-                .equals(VenitianBot.INSTANCE.getScreenName())) {
-            String reply = VenitianBot.INSTANCE.advertise(status);
-            Logger.info("Advertised " + reply + " in response to " + arg0.getText());
-        }
-
-
     }
 
     /**
