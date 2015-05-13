@@ -7,6 +7,8 @@ import bot.VenitianBot;
 import twitter4j.Status;
 import tweets.Location;
 
+import static utilities.Utilities.extractTags;
+
 /**
  * Encapsulates the content of a fetched status, after processing, together with
  * the additional information learned from classification.
@@ -34,7 +36,7 @@ public class RankedStatus implements Comparable<RankedStatus> {
             this.location = new Location(content.getGeoLocation());
         else this.location = null;
 
-        this.tags = new HashSet<>();
+        this.tags = extractTags(content.getText());
         this.isRelevant = false;
 
         isFeatured = VenitianBot.INSTANCE.getFeaturedUsers().contains(content.getUser().getName().toLowerCase());

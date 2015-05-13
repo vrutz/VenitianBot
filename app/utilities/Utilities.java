@@ -268,7 +268,24 @@ public class Utilities {
                 }
             }
         }
+    }
 
+    public static Set<String> extractTags(String tweet) {
+        Set<String> tags = new HashSet<>();
+
+        for (String keyWord : JSONReader.keyWords) {
+            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
+                tags.add(keyWord);
+            }
+        }
+
+        for (String keyWord : JSONReader.keyWordsGeneral) {
+            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
+                tags.add(keyWord);
+            }
+        }
+
+        return tags;
     }
 
 }

@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import static utilities.Utilities.extractTags;
+
 /**
  * Represent an answer that we can send on twitter. A response has a set of
  * associated keywords that can be used to increase its rank, as well as the
@@ -22,7 +24,7 @@ public class Response implements Comparable<Response> {
     // If no tags are given, they will be extracted from the tweet
     public Response(String tweet) {
         this.tweet = tweet;
-        this.tags = extractTags();
+        this.tags = extractTags(tweet);
         this.rank = MAXIMAL_RANK;
     }
 
@@ -69,25 +71,6 @@ public class Response implements Comparable<Response> {
     @Override
     public int compareTo(Response r2) {
         return rank - r2.rank;
-    }
-
-
-    private Set<String> extractTags() {
-        Set<String> tags = new HashSet<>();
-
-        for (String keyWord : JSONReader.keyWords) {
-            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
-                tags.add(keyWord);
-            }
-        }
-
-        for (String keyWord : JSONReader.keyWordsGeneral) {
-            if (tweet.toLowerCase().replaceAll(" ", "").contains(keyWord)) {
-                tags.add(keyWord);
-            }
-        }
-
-        return tags;
     }
 
     @Override
