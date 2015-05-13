@@ -138,5 +138,9 @@
 	{
 		"tweet": "Discover the Garzoni project: the life of apprentices and masters in modern Venice (XVI-XVIII). @Lille3 #DHLab @EPFL",
 		"tags": [ "venice" ]
+	},
+	{
+		"tweet": "The last bridge built over the #GrandCanal is Ponte della Costituzione opened in 2008 between Piazzale Roma and Ferrovia",
+		"tags": [ "ponte", "grand", "pontedellacostituzione", "piazza", "bridge", "canal", "grandcanal" ]
 	}
 ]
