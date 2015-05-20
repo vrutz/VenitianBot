@@ -48,7 +48,7 @@ public enum VenitianBot {
     private Responses responses;
 
     private String formURL = "goo.gl/forms/fyx0PSmBzk";
-    private String shamelessAdvertise = "Hey, I'm just a simple bot. Tell me more here: " + formURL;
+    private String shamelessAdvertise = "Hey, I'm just a simple bot, tell me more here: " + formURL + " Follow me if you want to learn cool facts about Venice! :)";
 
     private String[] featuredUsers = readFeaturedUsers();
 
