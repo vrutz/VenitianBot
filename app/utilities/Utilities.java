@@ -34,8 +34,16 @@ public class Utilities {
         return readJSON("./app/assets/query.json", "black-list");
     }
 
-    public static String[] readFeaturedUsers() {
-        return readJSON("./app/assets/query.json", "featured-users");
+    public static ArrayList<Long> readFeaturedUsers() {
+        String[] featured =  readJSON("./app/assets/query.json", "featured-users");
+
+        ArrayList<Long>  featuredIds =new ArrayList<>();
+
+        for (String id: featured) {
+            featuredIds.add(Long.parseLong(id));
+        }
+
+        return featuredIds;
     }
 
     private static String[] readJSON(String filePath, String key) {
@@ -158,11 +166,18 @@ public class Utilities {
     }
 
     public static List<Response> readResponses() {
+       return readResponses("./app/assets/responses.json");
+    }
+
+    public static List<Response> readStatusUpdates() {
+        return readResponses("./app/assets/statusupdates.json");
+    }
+    public static List<Response> readResponses(String fileName) {
         JSONParser parser = new JSONParser();
         FileReader fr = null;
         List<Response> responses = new ArrayList<>();
         try {
-            fr = new FileReader("./app/assets/responses.json");
+            fr = new FileReader(fileName);
             JSONArray respJSON = (JSONArray) parser.parse(fr);
 
             for (int i = 0; i < respJSON.size(); ++i) {
@@ -195,9 +210,18 @@ public class Utilities {
     }
 
     public static void writeResponse(Response response) {
+        writeResponsesToFile(response, "./app/assets/responses.json");
+
+    }
+
+    public static void writeStatusUpdate(Response status) {
+        writeResponsesToFile(status, "./app/assets/statusupdates.json");
+    }
+
+    private static void writeResponsesToFile(Response response, String fileName) {
         RandomAccessFile file;
         try {
-            file = new RandomAccessFile("./app/assets/responses.json", "rw");
+            file = new RandomAccessFile(fileName, "rw");
             file.seek(file.length() - 2);
             file.writeBytes(",\n\t{\n\t\t\"tweet\": \"");
             file.writeBytes(response.getTweet());

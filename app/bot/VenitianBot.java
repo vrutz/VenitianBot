@@ -14,10 +14,7 @@ import tweets.TweetedUsers;
 import twitter4j.*;
 import utilities.*;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.PriorityQueue;
+import java.util.*;
 
 import static utilities.Utilities.readFeaturedUsers;
 import static utilities.Utilities.readKeywords;
@@ -39,6 +36,7 @@ public enum VenitianBot {
     // keep users we have replied
     private TweetedUsers tweetedUsers;
     private PriorityQueue<RankedStatus> rankedTweets = new PriorityQueue<>();
+    private List<Response> statusUpdates = Utilities.readStatusUpdates();
 
     // replies
     private int count = 0;
@@ -50,7 +48,7 @@ public enum VenitianBot {
     private String formURL = "goo.gl/forms/fyx0PSmBzk";
     private String shamelessAdvertise = "Hey, I'm just a simple bot, tell me more here: " + formURL + " Follow me if you want to learn cool facts about #Venice! :)";
 
-    private String[] featuredUsers = readFeaturedUsers();
+    private ArrayList<Long> featuredUsers = readFeaturedUsers();
 
     /**
      * @return the twitter stream listener where we filter tweets and reply to some, etc ...
@@ -77,9 +75,9 @@ public enum VenitianBot {
             twitter = TwitterFactory.getSingleton();
             veniceLocation = JSONReader.veniceLocation;
             tweetedUsers = new TweetedUsers();
-
             Classifier.init();
             Logger.info("Classifier initialized");
+            setStatus();
 
             db = new StatusDatabase().init();
             Logger.info("Database up");
@@ -136,6 +134,7 @@ public enum VenitianBot {
         // OR Track keywords from the json
         filter.track(readKeywords());
         // OR Get tweets from the Venice region
+
         double[][] venice = {
                 // South West corner
                 {veniceLocation.getSW().getLatitude(),
@@ -205,7 +204,7 @@ public enum VenitianBot {
         count++;
         RankedStatus chosenTweet;
         Logger.debug("Received tweets " + count);
-        if (count % 150 == 0) {
+        if (count % 40 == 0) {
             Logger.debug("In if");
 
             do {
@@ -244,6 +243,7 @@ public enum VenitianBot {
 
             return null;
         }
+
         return "";
 
     }
@@ -293,13 +293,23 @@ public enum VenitianBot {
         return twitter.updateStatus(update).getText();
     }
 
+    public void setStatus() {
+        Response response = statusUpdates.get((int)(System.nanoTime() % statusUpdates.size()));
+        try {
+            twitter.updateStatus(response.getTweet());
+            Logger.debug("Status updated to " + response.getTweet());
+        } catch (TwitterException e) {
+            Logger.error("Could not update status: " + e.getErrorMessage());
+        }
+    }
+
     /**
      * Contains a list of important users that we will retweet each time
      *
      * @return the list of featured users
      */
-    public List<String> getFeaturedUsers() {
-        return Arrays.asList(featuredUsers);
+    public List<Long> getFeaturedUsers() {
+        return featuredUsers;
     }
 
     /**
